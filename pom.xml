@@ -4,7 +4,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.google.sps</groupId>
+<<<<<<< HEAD
   <artifactId>easyvote</artifactId>
+=======
+  <artifactId>Visualizer</artifactId>
+>>>>>>> 1a9865b678b4a917b52360906ad12c3327569c00
   <version>1</version>
   <packaging>war</packaging>
 
@@ -48,6 +52,7 @@
           <deploy.projectId>step-2020-johndallard</deploy.projectId>
         </configuration>
       </plugin>
+<<<<<<< HEAD
       <!-- New plugin necessary to deploy because old plugin is deprecated. 
       Can use `mvn appengine:run` for local testing. 
       Can use `mvn appengine:deploy` for deploying. -->
@@ -61,6 +66,8 @@
             <deploy.version>1</deploy.version>
         </configuration> -->
       </plugin>
+=======
+>>>>>>> 1a9865b678b4a917b52360906ad12c3327569c00
     </plugins>
   </build>
 </project>

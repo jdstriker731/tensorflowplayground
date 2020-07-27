@@ -1,6 +1,6 @@
 import React from "react";
 import EmbeddingForm from "./Form";
-import "./styles.scss";
+import "./App.scss";
 
 const DATASET_CREATE_STRING = "Create a dataset";
 const items = [
