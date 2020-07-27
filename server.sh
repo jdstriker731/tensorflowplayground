@@ -5,9 +5,9 @@
 #  ./server.sh [one of the MODE cases shown below]
 
 MODE=$1
-
+ 
 cd react_app
-npm install  
+npm install
 npm run build
 cd ..
 cp -r react_app/build/* src/main/webapp
