@@ -6,8 +6,8 @@
 
 MODE=$1
 
-npm install  
 cd react_app
+npm install  
 npm run build
 cd ..
 cp -r react_app/build/* src/main/webapp
