@@ -4,11 +4,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.google.sps</groupId>
-<<<<<<< HEAD
-  <artifactId>easyvote</artifactId>
-=======
+
   <artifactId>Visualizer</artifactId>
->>>>>>> 1a9865b678b4a917b52360906ad12c3327569c00
+
   <version>1</version>
   <packaging>war</packaging>
 
