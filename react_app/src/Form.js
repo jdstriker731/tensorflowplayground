@@ -4,7 +4,7 @@ import CreationModal from "./CreationModal.js";
 class EmbeddingForm extends React.Component {
   constructor(props) {
     super(props);
-    this.items = props.items;
+    this.menuItems = props.menuItems;
     this.state = {
       values: [],
       createMode: false
@@ -29,11 +29,11 @@ class EmbeddingForm extends React.Component {
         <CreationModal show={this.state.createMode} close={this.hideModal} />
         <div className="form">
           <form className="embedding-form" onSubmit={this.handleSubmit}>
-            {this.items.map(item => (
-              <label key={item.title} className="form-category">
-                <span className="category-title">{item.title}:</span>
-                <select value={this.state.values[item.index]}>
-                  {item.values.map(value => (
+            {this.menuItems.map(menuItem => (
+              <label key={menuItem.title} className="form-category">
+                <span className="category-title">{menuItem.title}:</span>
+                <select value={this.state.values[menuItem.index]}>
+                  {menuItem.values.map(value => (
                     <option className="form-option" key={value} value={value}>
                       {value}
                     </option>
