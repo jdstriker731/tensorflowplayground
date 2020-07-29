@@ -5,18 +5,18 @@ import styles from './App.scss';
 const items = [
   {
     index: 0,
-    title: "Model",
-    values: ["DeLF"]
+    title: 'Model',
+    values: ['DeLF']
   },
   {
     index: 1,
-    title: "Visualizer",
-    values: ["t-SNE"]
+    title: 'Visualizer',
+    values: ['t-SNE']
   },
   {
     index: 2,
-    title: "Dataset",
-    values: ["Dataset 1", "Dataset 2"]
+    title: 'Dataset',
+    values: ['Dataset 1', 'Dataset 2']
   }
 ];
 
