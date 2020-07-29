@@ -46,7 +46,7 @@
         <artifactId>appengine-maven-plugin</artifactId>
         <version>2.2.0</version>
         <configuration>
-          <!-- TODO: set project ID. -->
+          <!-- Project ID set to halvin for test deployment -->
           <deploy.projectId>step-2020-halvin</deploy.projectId>
         </configuration>
       </plugin>
