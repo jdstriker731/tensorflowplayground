@@ -1,6 +1,11 @@
 import React from 'react';
 import CreationModal from './CreationModal.js';
 
+const checkLoginStatus = () => {
+  // Determine Log-in status of user
+  window.location.replace('/authenticate');
+};
+
 class EmbeddingForm extends React.Component {
   constructor(props) {
     super(props);
@@ -27,6 +32,8 @@ class EmbeddingForm extends React.Component {
     return (
       <div className="form-wrapper">
         <CreationModal show={this.state.createMode} close={this.hideModal} />
+        <button type="button" onClick={checkLoginStatus}>Login/Logout</button>
+        <br />
         <div className="form">
           <form className="embedding-form" onSubmit={this.handleSubmit}>
             {this.menuItems.map(menuItem => (
