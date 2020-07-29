@@ -46,10 +46,8 @@
         <artifactId>appengine-maven-plugin</artifactId>
         <version>2.2.0</version>
         <configuration>
-          <!-- Project ID set to halvin for test deployment -->
-          <!-- 
-          <deploy.projectId>step-2020-halvin</deploy.projectId>
-          -->
+          <!-- TODO: set project ID -->
+          <!-- <deploy.projectId>[PROJECT ID HERE]</deploy.projectId> -->
         </configuration>
       </plugin>
       <!-- New plugin necessary to deploy because old plugin is deprecated. 
