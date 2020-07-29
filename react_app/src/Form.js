@@ -1,5 +1,5 @@
-import React from "react";
-import CreationModal from "./CreationModal.js";
+import React from 'react';
+import CreationModal from './CreationModal.js';
 
 class EmbeddingForm extends React.Component {
   constructor(props) {

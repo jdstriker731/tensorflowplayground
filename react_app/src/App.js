@@ -1,8 +1,7 @@
-import React from "react";
-import EmbeddingForm from "./Form";
-import styles from "./App.scss";
+import React from 'react';
+import EmbeddingForm from './Form';
+import styles from './App.scss';
 
-const DATASET_CREATE_STRING = "Create a dataset";
 const items = [
   {
     index: 0,
