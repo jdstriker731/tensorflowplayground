@@ -38,11 +38,18 @@ import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import java.nio.file.Paths;
+import com.google.common.collect.ImmutableList;
 
 /** Servlet for uploading files. */
 @WebServlet("/upload")
 @MultipartConfig
 public class UploadServlet extends HttpServlet {
+
+  // The ID of your GCP project
+  private static final String PROJECT_ID = "step-2020-johndallard";
+
+  // The ID of your GCS bucket
+  private static final String BUCKET_NAME = "embedding-visualizer-bucket";
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -60,91 +67,74 @@ public class UploadServlet extends HttpServlet {
     String datasetName = request.getParameter("dataset-namer");
     long timestamp = System.currentTimeMillis();
 
-    // Loop to see if that user already exists
-    boolean datasetPresent = false;
-    boolean userPresent = false;
-    boolean newDataset = true;  // Assume this is a new dataset being created
+
     for (Entity entity : results.asIterable()) {
       String email = (String) entity.getProperty("user-email");
       String dataset = (String) entity.getProperty("dataset-name");
 
       if (email.equals(userEmail)) {
-        userPresent = true;
         if (dataset.equals(datasetName)) {
-          // Do nothing, use this existing dataset
-          datasetPresent = true;
-          newDataset = false;
+          // This dataset already exists for the user
+          response.sendRedirect("/already_exists.html");
         }
       }
     }
-    
-    // If this user already has that dataset present
-    if (userPresent && datasetPresent) {
-      response.sendRedirect("/invalid.html");
-    }
 
+    /* Upload images from form to GCP bucket */
 
-    if (!datasetPresent) {
-      /* Upload images from form to GCP bucket */
+    int imageCount = 0;
 
-      int imageCount = 0;
+    Storage storage = StorageOptions.newBuilder().setProjectId(PROJECT_ID).build().getService();
 
-      // The ID of your GCP project
-      String projectId = "step-2020-johndallard";
+    // Create new directory within user's subdirectory for this dataset
+    String userDirectory = userEmail + "/";
+    String newDatasetDir = userDirectory + datasetName + "/";
+    String userImagesDir = newDatasetDir + "original_images/";
+    String userThumbnailsDir = newDatasetDir + "thumbnails/";
+    String userSpritesheetDir = newDatasetDir + "spritesheets/";
+    String userEmbeddingsDir = newDatasetDir + "embeddings/";
+    ImmutableList<String> directories = ImmutableList.of(userImagesDir, userThumbnailsDir, userSpritesheetDir, userEmbeddingsDir);
 
-      // The ID of your GCS bucket
-      String bucketName = "embedding-visualizer-bucket";
+    BlobId blobId = BlobId.of(BUCKET_NAME, userDirectory);
+    BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+    storage.create(blobInfo);
 
-      Storage storage = StorageOptions.newBuilder().setProjectId(projectId).build().getService();
-
-      // Create new directory within user's subdirectory for this dataset
-      String userDirectory = userEmail + "/";
-      String newDatasetDir = userDirectory + datasetName + "/";
-      String userImagesDir = newDatasetDir + "original_images/";
-      String userThumbnailsDir = newDatasetDir + "thumbnails/";
-      String userSpritesheetDir = newDatasetDir + "spritesheets/";
-      String userEmbeddingsDir = newDatasetDir + "embeddings/";
-      String[] directories = {userImagesDir, userThumbnailsDir, userSpritesheetDir, userEmbeddingsDir};
-
-      BlobId blobId = BlobId.of(bucketName, userDirectory);
-      BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
-      storage.create(blobInfo);
-
-      // Create new subdirectories for the new dataset
-      for (int i = 0; i < directories.length; i++) {
-        blobId = BlobId.of(bucketName, directories[i]);
-        blobInfo = BlobInfo.newBuilder(blobId).build();
-        storage.create(blobInfo);
-      }
-
-      Collection<Part> parts = request.getParts();
+    directories.forEach(pathway -> createBucketSubDirectory(pathway, storage, BUCKET_NAME));
       
-      for (Part part : parts) {
-        if (!"file-upload-dialog".equals(part.getName())) continue;
-        InputStream inputStream = part.getInputStream();
 
-        String fileName = Paths.get(part.getSubmittedFileName()).getFileName().toString(); // MSIE fix.
-        //The ID of your GCS object
-        String objectName = userImagesDir + fileName;
+    Collection<Part> parts = request.getParts();
+      
+    for (Part part : parts) {
+      if (!"file-upload-dialog".equals(part.getName())) continue;
+      InputStream inputStream = part.getInputStream();
 
-        blobId = BlobId.of(bucketName, objectName);
-        blobInfo = BlobInfo.newBuilder(blobId).build();
-        storage.create(blobInfo, inputStream);
-        imageCount++;
-      }
-    
-      /* Store metadata in Datastore */
-      Entity datasetEntity = new Entity("MetaData");
-      datasetEntity.setProperty("user-email", userEmail);
-      datasetEntity.setProperty("dataset-name", datasetName);
-      datasetEntity.setProperty("model", "DELG");
-      datasetEntity.setProperty("visualizer-type", "t-SNE");
-      datasetEntity.setProperty("image-count", imageCount);
-      datasetEntity.setProperty("timestamp", timestamp);
-      datastore.put(datasetEntity);
+      String fileName = Paths.get(part.getSubmittedFileName()).getFileName().toString(); // MSIE fix.
+      //The ID of your GCS object
+      String objectName = userImagesDir + fileName;
 
-      /* Redirect user */
-      response.sendRedirect("/index.html");
+      blobId = BlobId.of(BUCKET_NAME, objectName);
+      blobInfo = BlobInfo.newBuilder(blobId).build();
+      storage.create(blobInfo, inputStream);
+      imageCount++;
     }
+    
+    /* Store metadata in Datastore */
+    Entity datasetEntity = new Entity("MetaData");
+    datasetEntity.setProperty("user-email", userEmail);
+    datasetEntity.setProperty("dataset-name", datasetName);
+    datasetEntity.setProperty("model", "DELG");
+    datasetEntity.setProperty("visualizer-type", "t-SNE");
+    datasetEntity.setProperty("image-count", imageCount);
+    datasetEntity.setProperty("timestamp", timestamp);
+    datastore.put(datasetEntity);
+
+    /* Redirect user */
+    response.sendRedirect("/index.html");
+  }
+
+  private void createBucketSubDirectory(String path, Storage storageLocation, String bucket) {
+    BlobId blobId = BlobId.of(bucket, path);
+    BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+    storageLocation.create(blobInfo);
   }
 }
