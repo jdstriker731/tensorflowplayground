@@ -34,7 +34,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
-@WebServlet()
-public class CoordinateRetrievalServlet extends HttpServlet {
+@WebServlet("/proxy/*")
+public class GcsProxyServlet extends HttpServlet {
+  // fetch string: fetch('proxy/bucket/user_email/datasets/the_spritesheet.png')
+  doGet() {
 
+  }
 }
