@@ -38,7 +38,6 @@ import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import java.nio.file.Paths;
-import com.google.common.collect.ImmutableList;
 
 /** Servlet for uploading files. */
 @WebServlet("/upload")
@@ -76,6 +75,7 @@ public class UploadServlet extends HttpServlet {
         if (dataset.equals(datasetName)) {
           // This dataset already exists for the user
           response.sendRedirect("/already_exists.html");
+          return;
         }
       }
     }
@@ -90,20 +90,16 @@ public class UploadServlet extends HttpServlet {
     String userDirectory = userEmail + "/";
     String newDatasetDir = userDirectory + datasetName + "/";
     String userImagesDir = newDatasetDir + "original_images/";
-    String userThumbnailsDir = newDatasetDir + "thumbnails/";
-    String userSpritesheetDir = newDatasetDir + "spritesheets/";
-    String userEmbeddingsDir = newDatasetDir + "embeddings/";
-    ImmutableList<String> directories = ImmutableList.of(userImagesDir, userThumbnailsDir, userSpritesheetDir, userEmbeddingsDir);
 
     BlobId blobId = BlobId.of(BUCKET_NAME, userDirectory);
     BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
     storage.create(blobInfo);
 
-    directories.forEach(pathway -> createBucketSubDirectory(pathway, storage, BUCKET_NAME));
+    blobId = BlobId.of(BUCKET_NAME, userImagesDir);
+    blobInfo = BlobInfo.newBuilder(blobId).build();
+    storage.create(blobInfo);
       
-
     Collection<Part> parts = request.getParts();
-      
     for (Part part : parts) {
       if (!"file-upload-dialog".equals(part.getName())) continue;
       InputStream inputStream = part.getInputStream();
