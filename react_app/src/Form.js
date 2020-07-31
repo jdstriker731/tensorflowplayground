@@ -57,19 +57,6 @@ class EmbeddingForm extends React.Component {
         >
           Create a new dataset
         </button>
-        <br />
-        <br />
-        
-        <label className="form-category">
-          <span className="category-title">Dataset:</span>
-            <select name="dataset-picker" id="dataset-picker">
-              {this.props.userDatasets.map(value => (
-                <option className="form-option" key={value} value={value}>
-                  {value}
-                </option>
-              ))}
-            </select>
-        </label>
       </div>
     );
   }
