@@ -2,28 +2,30 @@ import React from 'react';
 import EmbeddingForm from './Form';
 import styles from './App.scss';
 
-const items = [
-  {
-    index: 0,
-    title: 'Model',
-    values: ['DeLF']
-  },
-  {
-    index: 1,
-    title: 'Visualizer',
-    values: ['t-SNE']
-  },
-  {
-    index: 2,
-    title: 'Dataset',
-    values: ['Dataset 1', 'Dataset 2']
+export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { datasets: [] };
+    this.fetchUserDatasets = this.fetchUserDatasets.bind(this);
   }
-];
 
-export default function App() {
-  return (
-    <div className="App">
-      <EmbeddingForm menuItems={items} />
-    </div>
-  );
+  componentDidMount() {
+    this.fetchUserDatasets();
+  }
+
+  fetchUserDatasets() {
+    fetch("/dataset-names").then(response => response.json()).then(userDatasets => {
+      // Store the names of the datasets the user has made
+      this.setState({ datasets: userDatasets });
+    });
+  }
+
+
+  render() {
+    return (
+      <div className="App">
+        <EmbeddingForm userDatasets={this.state.datasets} />
+      </div>
+    );
+  }
 }

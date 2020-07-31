@@ -14,6 +14,9 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.api.blobstore.BlobstoreService;
+import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -34,7 +37,30 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
-@WebServlet()
+@WebServlet("/coordinates")
 public class CoordinateRetrievalServlet extends HttpServlet {
+   
+  // The ID of your GCS bucket
+  private static final String BUCKET_NAME = "coordinate_bucket";
 
+  @Override
+  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+    // Get current user logged in to webapp 
+    UserService userService = UserServiceFactory.getUserService();
+    String userEmail = userService.getCurrentUser().getEmail();
+    
+    // Get the name of the dataset they want to visualize
+    String datasetName = request.getParameter("dataset-name"); 
+
+    // Get the path to the spritesheet
+    String userDirectory = BUCKET_NAME + "/" + userEmail + "/";
+    String userDatasetDir = userDirectory + datasetName + "/";
+    String userJsonFilePath = userDatasetDir + "coordinates.json";
+    
+    BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
+    BlobKey blobKey = blobstoreService.createGsBlobKey(
+        "/gs/" + userJsonFilePath);
+    blobstoreService.serve(blobKey, response);
+  }
 }
