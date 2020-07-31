@@ -35,16 +35,11 @@ public class AuthenticateServlet extends HttpServlet {
       String userEmail = userService.getCurrentUser().getEmail();
       String urlToRedirectToAfterLogOut = "/index.html";
       String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterLogOut);
-
-      response.getWriter().println("<p>Hello " + userEmail + "! You are currently logged in.</p>");
-      response.getWriter().println("<p>Logout and return to home page: <a href=\"" + logoutUrl + "\">Home</a>.<p>");
+      response.sendRedirect(logoutUrl);
     } else {
       String urlToRedirectToAfterLogIn = "/index.html";
       String loginUrl = userService.createLoginURL(urlToRedirectToAfterLogIn);
-
-      response.getWriter().println("<p>Hello there! You need to login to access the comments page.</p>");
-      response.getWriter().println("<p>Login <a href=\""+ loginUrl + "\">here</a>.</p>");
-      response.getWriter().println("<p>Return to Home page: <a href=\"index.html\">Home</a>.</p>");
+      response.sendRedirect(loginUrl);
     }
   }
 }
