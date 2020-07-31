@@ -9,7 +9,6 @@ const checkLoginStatus = () => {
 class EmbeddingForm extends React.Component {
   constructor(props) {
     super(props);
-    this.menuItems = props.menuItems;
     this.state = {
       values: [],
       createMode: false
@@ -36,18 +35,16 @@ class EmbeddingForm extends React.Component {
         <br />
         <div className="form">
           <form className="embedding-form" onSubmit={this.handleSubmit}>
-            {this.menuItems.map(menuItem => (
-              <label key={menuItem.title} className="form-category">
-                <span className="category-title">{menuItem.title}:</span>
-                <select value={this.state.values[menuItem.index]}>
-                  {menuItem.values.map(value => (
+              <label className="form-category">
+                <span className="category-title">Dataset:</span>
+                <select name="dataset" id="dataset">
+                  {this.props.userDatasets.map(value => (
                     <option className="form-option" key={value} value={value}>
                       {value}
                     </option>
                   ))}
                 </select>
               </label>
-            ))}
             <button type="submit" className="form-submit">
               Submit
             </button>
