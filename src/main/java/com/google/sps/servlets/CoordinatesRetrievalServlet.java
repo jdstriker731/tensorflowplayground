@@ -41,7 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 public class CoordinatesRetrievalServlet extends HttpServlet {
    
   // The ID of your GCS bucket
-  private static final String BUCKET_NAME = "coordinate_bucket";
+  private static final String BUCKET_NAME = "coordinates_json_bucket";
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
