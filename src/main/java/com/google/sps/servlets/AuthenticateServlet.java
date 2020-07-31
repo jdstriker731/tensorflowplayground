@@ -40,7 +40,6 @@ public class AuthenticateServlet extends HttpServlet {
       String urlToRedirectToAfterLogIn = "/index.html";
       String loginUrl = userService.createLoginURL(urlToRedirectToAfterLogIn);
       response.sendRedirect(loginUrl);
-      response.getWriter().println("<p>Hello there! You need to login to access the comments page.</p>");
     }
   }
 }
