@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
-@WebServlet("/coordinates")
+@WebServlet("/coordinates-retrieval")
 public class CoordinatesRetrievalServlet extends HttpServlet {
    
   // The ID of your GCS bucket
