@@ -35,35 +35,37 @@ function CreationModal({ show, close, children }) {
 
     close();
   }
-
+  
   async function datasetUpload() {
     setUploading(true);
     await delay(4000); // Temporarily mock upload until web infrastructure in place
     setUploading(false);
     setUploadComplete(true);
   }
-
+  
   return (
     show && (
     <div className='creation-modal'>
       <section className="modal-main">
         <UploadIndicator show={uploading}/>
-        <form className="input-dialog" id="input-dialog">
+        <form className="input-dialog" id="input-dialog" action="/upload" method="POST" enctype="multipart/form-data">
           <input
             type="text"
             className="dataset-namer"
             id="dataset-namer"
+            name="dataset-namer"
             placeholder="Dataset name..."
             onChange={datasetNameChange}
           />
           <input
             type="file"
-            multiple="multiple"
             className="file-upload-dialog"
             id="file-upload-dialog"
+            name="file-upload-dialog"
             onChange={fileUpload}
             disabled={!hasName}
             accept=".jpg, .jpeg, .png"
+            multiple
           />
           <label className="file-label" htmlFor="file-upload-dialog">
             Browse for photos
