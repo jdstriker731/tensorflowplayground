@@ -132,7 +132,7 @@ export class ThreeRenderer extends React.Component {
     fetch(json_url)
     .then(result => result.json())
     .then(out => {
-        numImages = out['images'].length;
+        numImages = out['points'].length;
       });
 
     const image = new Image(IMAGE_SIZE);
@@ -149,10 +149,10 @@ export class ThreeRenderer extends React.Component {
     fetch(json_url)
     .then(result => result.json())
     .then(out => {
-      for (const image of out['images']){
-        const x = image['visualization_coordinates']['x'];
-        const y = image['visualization_coordinates']['y'];
-        const z = image['visualization_coordinates']['z'];
+      for (const point of out['points']){
+        const x = point['x'];
+        const y = point['y'];
+        const z = point['z'];
 
         points.push(new Point(x, y, z));
       }
