@@ -121,44 +121,43 @@ export class ThreeRenderer extends React.Component {
     
     this.canvasWidth = props.canvasWidth;
     this.canvasHeight = props.canvasHeight;
-  }
 
-  // Loads json object for dataset and initiates Atlas object
-  initAtlas() {
-    const json_url = "/coordinates-retrieval?dataset=".concat(this.dataset);
-    var numImages = 0;
-    const numRows = 1;
-
-    fetch(json_url)
-    .then(result => result.json())
-    .then(out => {
-        numImages = out['points'].length;
-      });
-
-    const image = new Image(IMAGE_SIZE);
-    const numColumns = numImages;
-
-    return new Atlas(image, numImages, numRows, numColumns);
+    this.camera = this.createCamera();
+    this.canvas = this.createCanvas();
+    this.renderer = new THREE.WebGLRenderer({antialias: true, canvas});
   }
 
   // Loads json object for dataset and returns array of points
-  initPoints() {
-    const json_url = "/coordinates-retrieval?dataset=".concat(this.dataset);
-    var points = []
+  async initPoints(material) {
+    var numImages = 0;
+    const numRows = 1;
 
-    fetch(json_url)
-    .then(result => result.json())
-    .then(out => {
-      for (const point of out['points']){
-        const x = point['x'];
-        const y = point['y'];
-        const z = point['z'];
+    const result = await fetch(json_url);
+    const out = result.json();
 
-        points.push(new Point(x, y, z));
-      }
+    const points = out['points'].map((point_json) => {
+      const {x, y, z} = point_json;
+      return new Point(x, y, z);
     });
+    
+    numImages = points.length;
+    const numColumns = numImages;
 
-    return points;
+    const atlas = new Atlas(new Image(IMAGE_SIZE), numImages, numRows, numColumns);
+
+    const geometry = new AtlasGeometry(atlas, points);
+
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(0, 0, 0);
+    scene.add(mesh);
+
+    function render() {
+      renderer.render(scene, camera);
+      requestAnimationFrame(render);
+      controls.update();
+    }
+
+    render();
   }
 
   // Appends a new canvas element to this.mount
@@ -189,8 +188,6 @@ export class ThreeRenderer extends React.Component {
   }
 
   componentDidMount() {
-    const canvas = this.createCanvas();
-    const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
     renderer.setSize(800, 800);
 
     const scene = new THREE.Scene();
@@ -214,27 +211,12 @@ export class ThreeRenderer extends React.Component {
 
     material.side = THREE.DoubleSide;
 
-    // Identify the total number of cols & rows in the image atlas
-    const atlas = this.initAtlas();
-
     // Create list of (random) points to map images to
     // Later on, this will be t-SNE coordinates
-    const points = this.initPoints();
+    const points = this.initPoints(material);
 
     // ------ CREATING CUSTOM GEOMETRY -------
-    const geometry = new AtlasGeometry(atlas, points);
 
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(0, 0, 0);
-    scene.add(mesh);
-
-    function render() {
-      renderer.render(scene, camera);
-      requestAnimationFrame(render);
-      controls.update();
-    }
-
-    render();
   }
 
   render(){
