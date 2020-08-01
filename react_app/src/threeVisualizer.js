@@ -122,9 +122,13 @@ export class ThreeRenderer extends React.Component {
     this.canvasWidth = props.canvasWidth;
     this.canvasHeight = props.canvasHeight;
 
-    this.camera = this.createCamera();
-    this.canvas = this.createCanvas();
-    this.renderer = new THREE.WebGLRenderer({antialias: true, canvas});
+    this.camera = undefined;
+    this.scene = undefined;
+    this.controls = undefined;
+    this.material = undefined;
+    this.renderer = undefined;
+    this.canvas = undefined;
+    this.light = undefined;
   }
 
   // Loads json object for dataset and returns array of points
@@ -147,14 +151,14 @@ export class ThreeRenderer extends React.Component {
 
     const geometry = new AtlasGeometry(atlas, points);
 
-    const mesh = new THREE.Mesh(geometry, material);
+    const mesh = new THREE.Mesh(geometry, this.material);
     mesh.position.set(0, 0, 0);
-    scene.add(mesh);
+    this.scene.add(mesh);
 
     function render() {
-      renderer.render(scene, camera);
-      requestAnimationFrame(render);
-      controls.update();
+      this.renderer.render(this.scene, this.camera);
+      requestAnimationFrame(this.render);
+      this.controls.update();
     }
 
     render();
@@ -190,33 +194,29 @@ export class ThreeRenderer extends React.Component {
   componentDidMount() {
     renderer.setSize(800, 800);
 
-    const scene = new THREE.Scene();
-    const camera = this.createCamera();
+    this.camera = this.createCamera();
+    this.canvas = this.createCanvas();
+    this.scene = new THREE.Scene();
 
-    const light = new THREE.PointLight(0xffffff, 0.7, 0);
-    light.position.set(1, 1, 100);
-    scene.add(light);
+    this.light = new THREE.PointLight(0xffffff, 0.7, 0);
+    this.light.position.set(1, 1, 100);
+    this.scene.add(this.light);
 
-    const controls = new TrackballControls(camera, renderer.domElement);
+    this.renderer = new THREE.WebGLRenderer({antialias: true, this.canvas});
+    this.controls = new TrackballControls(this.camera, this.renderer.domElement);
 
-    const loader = new THREE.TextureLoader();
-    loader.setCrossOrigin('anonymous');
+    this.loader = new THREE.TextureLoader();
 
-    const query = '/spritesheet-retrieval?dataset='.concat(this.dataset);
-
-    // Load an image file into a custom material
-    const material = new THREE.MeshBasicMaterial({
-      map: loader.load(query)
+    const img_query = '/spritesheet-retrieval?dataset='.concat(this.dataset);
+    this.material = new THREE.MeshBasicMaterial({
+      map: this.loader.load(img_query)
     });
 
-    material.side = THREE.DoubleSide;
+    this.material.side = THREE.DoubleSide;
 
     // Create list of (random) points to map images to
     // Later on, this will be t-SNE coordinates
-    const points = this.initPoints(material);
-
-    // ------ CREATING CUSTOM GEOMETRY -------
-
+    this.initPoints();
   }
 
   render(){
