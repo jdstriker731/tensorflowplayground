@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import React from 'react';
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
 
+const IMAGE_SIZE = 64;
+
 class Image {
   constructor(size) {
     this.width = size;
@@ -115,11 +117,48 @@ export class ThreeRenderer extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      dataset: props.dataset
-    }
+    this.dataset = props.dataset;
+    
     this.canvasWidth = props.canvasWidth;
     this.canvasHeight = props.canvasHeight;
+  }
+
+  // Loads json object for dataset and initiates Atlas object
+  initAtlas() {
+    const json_url = "/coordinates-retrieval?dataset=".concat(this.dataset);
+    var numImages = 0;
+    const numRows = 1;
+
+    fetch(json_url)
+    .then(result => result.json())
+    .then(out => {
+        numImages = out['images'].length;
+      });
+
+    const image = new Image(IMAGE_SIZE);
+    const numColumns = numImages;
+
+    return new Atlas(image, numImages, numRows, numColumns);
+  }
+
+  // Loads json object for dataset and returns array of points
+  initPoints() {
+    const json_url = "/coordinates-retrieval?dataset=".concat(this.dataset);
+    var points = []
+
+    fetch(json_url)
+    .then(result => result.json())
+    .then(out => {
+      for (const image of out['images']){
+        const x = image['visualization_coordinates']['x'];
+        const y = image['visualization_coordinates']['y'];
+        const z = image['visualization_coordinates']['z'];
+
+        points.push(new Point(x, y, z));
+      }
+    });
+
+    return points;
   }
 
   // Appends a new canvas element to this.mount
@@ -166,25 +205,21 @@ export class ThreeRenderer extends React.Component {
     const loader = new THREE.TextureLoader();
     loader.setCrossOrigin('anonymous');
 
-    const query = '/spritesheet-retrieval?dataset='.concat(this.state.dataset);
+    const query = '/spritesheet-retrieval?dataset='.concat(this.dataset);
 
     // Load an image file into a custom material
     const material = new THREE.MeshBasicMaterial({
       map: loader.load(query)
     });
 
-    // Identify the subimage size in px
-    const image = new Image(128);
+    material.side = THREE.DoubleSide;
 
     // Identify the total number of cols & rows in the image atlas
-    const atlas = new Atlas(image, 1, 1, 1);
+    const atlas = this.initAtlas();
 
     // Create list of (random) points to map images to
     // Later on, this will be t-SNE coordinates
-    const points = [];
-    for (var i = 0; i < atlas.numImages; ++i) {
-      points[i] = new Point();
-    }
+    const points = this.initPoints();
 
     // ------ CREATING CUSTOM GEOMETRY -------
     const geometry = new AtlasGeometry(atlas, points);
