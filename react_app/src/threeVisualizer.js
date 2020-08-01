@@ -122,13 +122,6 @@ export class ThreeRenderer extends React.Component {
     this.canvasWidth = props.canvasWidth;
     this.canvasHeight = props.canvasHeight;
 
-<<<<<<< HEAD
-    this.camera = this.createCamera();
-    this.scene = new THREE.Scene();
-    this.canvas = this.createCanvas();
-    
-    this.renderer = new THREE.WebGLRenderer({antialias: true, this.canvas});
-=======
     this.camera = undefined;
     this.scene = undefined;
     this.controls = undefined;
@@ -136,7 +129,6 @@ export class ThreeRenderer extends React.Component {
     this.renderer = undefined;
     this.canvas = undefined;
     this.light = undefined;
->>>>>>> 96a6befd795f75bcc94ca63d66580a450b926bdf
   }
 
   // Loads json object for dataset and returns array of points
@@ -210,7 +202,7 @@ export class ThreeRenderer extends React.Component {
     this.light.position.set(1, 1, 100);
     this.scene.add(this.light);
 
-    this.renderer = new THREE.WebGLRenderer({antialias: true, this.canvas});
+    this.renderer = new THREE.WebGLRenderer({antialias: true, canvas: this.canvas});
     this.controls = new TrackballControls(this.camera, this.renderer.domElement);
 
     this.loader = new THREE.TextureLoader();
