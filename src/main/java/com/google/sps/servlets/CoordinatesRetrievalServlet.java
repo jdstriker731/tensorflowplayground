@@ -35,32 +35,41 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.logging.Logger;
+import javax.servlet.ServletException;
 
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
 @WebServlet("/coordinates-retrieval")
 public class CoordinatesRetrievalServlet extends HttpServlet {
    
   // The ID of your GCS bucket
-  private static final String BUCKET_NAME = "coordinate_bucket";
+  private static final String BUCKET_NAME = "spritesheet_json";
+  private static final Logger log = Logger.getLogger(CoordinatesRetrievalServlet.class.getName());
 
   @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
     // Get current user logged in to webapp 
     UserService userService = UserServiceFactory.getUserService();
     String userEmail = userService.getCurrentUser().getEmail();
     
     // Get the name of the dataset they want to visualize
-    String datasetName = request.getParameter("dataset-name"); 
+    String datasetName = request.getParameter("dataset"); 
 
     // Get the path to the spritesheet
     String userDirectory = BUCKET_NAME + "/" + userEmail + "/";
     String userDatasetDir = userDirectory + datasetName + "/";
     String userJsonFilePath = userDatasetDir + "coordinates.json";
-    
-    BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
-    BlobKey blobKey = blobstoreService.createGsBlobKey(
-        "/gs/" + userJsonFilePath);
-    blobstoreService.serve(blobKey, response);
+
+    log.info("OH HAI THAR! Downloading: " + userJsonFilePath);
+
+    try {
+      BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
+      BlobKey blobKey = blobstoreService.createGsBlobKey("/gs/" + userJsonFilePath);
+      blobstoreService.serve(blobKey, response);
+      log.info("KTHNXBAI" + userJsonFilePath);
+    } catch(IOException e) {
+      log.info(e.toString());
+    }
   }
 }

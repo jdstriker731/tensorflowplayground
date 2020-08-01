@@ -7,6 +7,7 @@ react_app/coverage
 
 # production
 react_app/build
+src/main/webapp/static
 
 # misc
 react_app/.DS_Store

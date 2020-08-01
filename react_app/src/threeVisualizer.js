@@ -138,7 +138,7 @@ export class ThreeRenderer extends React.Component {
 
     const json_url = "/coordinates-retrieval?dataset=".concat(this.dataset);
     const result = await fetch(json_url);
-    const out = result.json();
+    const out = await result.json();
 
     const points = out['points'].map((point_json) => {
       const {x, y, z} = point_json;
@@ -156,13 +156,14 @@ export class ThreeRenderer extends React.Component {
     mesh.position.set(0, 0, 0);
     this.scene.add(mesh);
 
-    function render() {
-      this.renderer.render(this.scene, this.camera);
-      requestAnimationFrame(this.render);
-      this.controls.update();
+    const component = this;
+    function render3d() {
+      component.renderer.render(component.scene, component.camera);
+      requestAnimationFrame(render3d);
+      component.controls.update();
     }
-
-    render();
+  
+    render3d();
   }
 
   // Appends a new canvas element to this.mount
