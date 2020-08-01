@@ -136,6 +136,7 @@ export class ThreeRenderer extends React.Component {
     var numImages = 0;
     const numRows = 1;
 
+    const json_url = "/coordinates-retrieval?dataset=".concat(this.dataset);
     const result = await fetch(json_url);
     const out = result.json();
 
@@ -192,7 +193,7 @@ export class ThreeRenderer extends React.Component {
   }
 
   componentDidMount() {
-    renderer.setSize(800, 800);
+    this.renderer.setSize(800, 800);
 
 
     this.camera = this.createCamera();
