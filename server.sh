@@ -36,7 +36,7 @@ case $MODE in
               exit 1;
           fi;
           build_react_app;
-          mvn package appengine:deploy -Dapp.deploy.version=dev
+          mvn package appengine:deploy -Dapp.deploy.version=${2}
           ;;
      *)
           echo -e $"\n\t${RED_TEXT}You selected \"$MODE\", which is not a valid mode. ${DEFAULT_TEXT}Choose one of: {run|deploy}.\n";

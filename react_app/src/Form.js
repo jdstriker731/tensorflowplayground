@@ -10,12 +10,25 @@ class EmbeddingForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      values: [],
+      selectedValue: "",
       createMode: false
     };
 
+    this.setSelection = this.setSelection.bind(this);
+    this.submitSelection = this.submitSelection.bind(this);
     this.showModal = this.showModal.bind(this);
     this.hideModal = this.hideModal.bind(this);
+  }
+
+  setSelection(event) {
+    event.persist();
+    this.setState({selectedValue: event.target.value}, () => {
+      console.log(this.state.selectedValue)
+    });
+  }
+
+  submitSelection() {
+    this.props.callback(this.state.selectedValue);
   }
 
   // Handles showing and hiding modal for dataset uploads
@@ -34,10 +47,10 @@ class EmbeddingForm extends React.Component {
         <button type="button" onClick={checkLoginStatus}>Login/Logout</button>
         <br />
         <div className="form">
-          <form className="embedding-form" onSubmit={this.handleSubmit}>
+          <div className="embedding-form">
               <label className="form-category">
                 <span className="category-title">Dataset:</span>
-                <select name="dataset" id="dataset">
+                <select onChange={this.setSelection} name="dataset" id="dataset">
                   {this.props.userDatasets.map(value => (
                     <option className="form-option" key={value} value={value}>
                       {value}
@@ -45,10 +58,10 @@ class EmbeddingForm extends React.Component {
                   ))}
                 </select>
               </label>
-            <button type="submit" className="form-submit">
+            <button onClick={this.submitSelection} className="form-submit">
               Submit
             </button>
-          </form>
+          </div>
         </div>
         <button
           type="button"

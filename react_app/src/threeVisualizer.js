@@ -114,6 +114,10 @@ class AtlasGeometry extends THREE.Geometry {
 export class ThreeRenderer extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      dataset: props.dataset
+    }
     this.canvasWidth = props.canvasWidth;
     this.canvasHeight = props.canvasHeight;
   }
@@ -162,18 +166,18 @@ export class ThreeRenderer extends React.Component {
     const loader = new THREE.TextureLoader();
     loader.setCrossOrigin('anonymous');
 
+    const query = '/spritesheet-retrieval?dataset='.concat(this.state.dataset);
+
     // Load an image file into a custom material
     const material = new THREE.MeshBasicMaterial({
-      map: loader.load(
-        "/spritesheet"
-      )
+      map: loader.load(query)
     });
 
     // Identify the subimage size in px
     const image = new Image(128);
 
     // Identify the total number of cols & rows in the image atlas
-    const atlas = new Atlas(image, 100, 10, 10);
+    const atlas = new Atlas(image, 1, 1, 1);
 
     // Create list of (random) points to map images to
     // Later on, this will be t-SNE coordinates
