@@ -133,19 +133,18 @@ export class ThreeRenderer extends React.Component {
     .then(result => result.json())
     .then(out => {
         numImages = out['images'].length;
-      }
-    });
+      });
 
     const image = new Image(IMAGE_SIZE);
     const numColumns = numImages;
 
-    return new Atlas(images, numImages, numRows, numColumns);
+    return new Atlas(image, numImages, numRows, numColumns);
   }
 
   // Loads json object for dataset and returns array of points
   initPoints() {
     const json_url = "/coordinates-retrieval?dataset=".concat(this.dataset);
-    points = []
+    var points = []
 
     fetch(json_url)
     .then(result => result.json())
