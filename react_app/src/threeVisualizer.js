@@ -197,10 +197,10 @@ export class ThreeRenderer extends React.Component {
     this.renderer = new THREE.WebGLRenderer({antialias: true, canvas: this.canvas});
     this.renderer.setSize(800, 800);
 
+
     this.camera = this.createCamera();
     this.canvas = this.createCanvas();
     this.scene = new THREE.Scene();
-
     this.light = new THREE.PointLight(0xffffff, 0.7, 0);
     this.light.position.set(1, 1, 100);
     this.scene.add(this.light);

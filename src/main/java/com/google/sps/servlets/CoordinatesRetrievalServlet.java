@@ -44,7 +44,10 @@ public class CoordinatesRetrievalServlet extends HttpServlet {
    
   // The ID of your GCS bucket
   private static final String BUCKET_NAME = "spritesheet_json";
+<<<<<<< HEAD
   private static final Logger log = Logger.getLogger(CoordinatesRetrievalServlet.class.getName());
+=======
+>>>>>>> 0639b3b5ecf45ae04ee2ebf71089ad762def31ca
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
