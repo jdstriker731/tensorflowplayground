@@ -136,6 +136,7 @@ export class ThreeRenderer extends React.Component {
     var numImages = 0;
     const numRows = 1;
 
+    const json_url = "/coordinates-retrieval?dataset=".concat(this.dataset);
     const result = await fetch(json_url);
     const out = result.json();
 
@@ -192,7 +193,7 @@ export class ThreeRenderer extends React.Component {
   }
 
   componentDidMount() {
-    renderer.setSize(800, 800);
+    this.renderer.setSize(800, 800);
 
     this.camera = this.createCamera();
     this.canvas = this.createCanvas();
@@ -202,7 +203,7 @@ export class ThreeRenderer extends React.Component {
     this.light.position.set(1, 1, 100);
     this.scene.add(this.light);
 
-    this.renderer = new THREE.WebGLRenderer({antialias: true, this.canvas});
+    this.renderer = new THREE.WebGLRenderer({antialias: true, canvas: this.canvas});
     this.controls = new TrackballControls(this.camera, this.renderer.domElement);
 
     this.loader = new THREE.TextureLoader();
