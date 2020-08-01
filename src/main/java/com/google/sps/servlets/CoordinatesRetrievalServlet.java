@@ -41,7 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 public class CoordinatesRetrievalServlet extends HttpServlet {
    
   // The ID of your GCS bucket
-  private static final String BUCKET_NAME = "coordinates_json_bucket";
+  private static final String BUCKET_NAME = "spritesheet_json";
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -51,7 +51,7 @@ public class CoordinatesRetrievalServlet extends HttpServlet {
     String userEmail = userService.getCurrentUser().getEmail();
     
     // Get the name of the dataset they want to visualize
-    String datasetName = request.getParameter("dataset-name"); 
+    String datasetName = request.getParameter("dataset"); 
 
     // Get the path to the spritesheet
     String userDirectory = BUCKET_NAME + "/" + userEmail + "/";

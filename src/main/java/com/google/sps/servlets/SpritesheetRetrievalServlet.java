@@ -51,12 +51,12 @@ public class SpritesheetRetrievalServlet extends HttpServlet {
     String userEmail = userService.getCurrentUser().getEmail();
     
     // Get the name of the dataset they want to visualize
-    String datasetName = request.getParameter("dataset-name"); 
+    String datasetName = request.getParameter("dataset"); 
 
     // Get the path to the spritesheet
     String userDirectory = BUCKET_NAME + "/" + userEmail + "/";
     String userDatasetDir = userDirectory + datasetName + "/";
-    String userSpritesheetPath = userDatasetDir + "askewc_zrh_spritesheets_zrh_1.jpg.png";
+    String userSpritesheetPath = userDatasetDir + "spritesheets/spritesheet.png";
     
     BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
     BlobKey blobKey = blobstoreService.createGsBlobKey(
