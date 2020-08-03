@@ -4,7 +4,7 @@ import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls
 
 const IMAGE_SIZE = 64;
 
-class Image {
+class ImageParams {
   constructor(size) {
     this.width = size;
     this.height = size;
@@ -86,28 +86,28 @@ class AtlasGeometry extends THREE.Geometry {
       // Identify this subimage's offset in the x dimension
       // An xOffset of 0 means the subimage starts flush with
       // the left-hand edge of the atlas
-      var xOffset = (i % 10) * (atlas.image.width / atlas.width);
+      var xOffset = i * (atlas.image.width / atlas.width);
 
       // Identify the subimage's offset in the y dimension
       // A yOffset of 0 means the subimage starts flush with
       // the top edge of the atlas
-      var yOffset = Math.floor(i / 10) * (atlas.image.height / atlas.height);
+      var yOffset = 0;
 
       // Use the xOffset and yOffset (and the knowledge that
       // each row and column contains only 10 images) to specify
       // the regions of the current image
       this.faceVertexUvs[0].push([
         new THREE.Vector2(xOffset, yOffset),
-        new THREE.Vector2(xOffset + 0.1, yOffset),
-        new THREE.Vector2(xOffset + 0.1, yOffset + 0.1)
+        new THREE.Vector2(xOffset + (1.0 / atlas.numImages), yOffset),
+        new THREE.Vector2(xOffset + (1.0 / atlas.numImages), yOffset + 1.0)
       ]);
 
       // Map the region of the image described by the lower-left,
       // upper-right, and upper-left vertices to `faceTwo`
       this.faceVertexUvs[0].push([
         new THREE.Vector2(xOffset, yOffset),
-        new THREE.Vector2(xOffset + 0.1, yOffset + 0.1),
-        new THREE.Vector2(xOffset, yOffset + 0.1)
+        new THREE.Vector2(xOffset + (1.0 / atlas.numImages), yOffset + 1.0),
+        new THREE.Vector2(xOffset, yOffset + 1.0)
       ]);
     }
   }
@@ -148,7 +148,7 @@ export class ThreeRenderer extends React.Component {
     numImages = points.length;
     const numColumns = numImages;
 
-    const atlas = new Atlas(new Image(IMAGE_SIZE), numImages, numRows, numColumns);
+    const atlas = new Atlas(new ImageParams(IMAGE_SIZE), numImages, numRows, numColumns);
 
     const geometry = new AtlasGeometry(atlas, points);
 
