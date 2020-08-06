@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,13 +25,14 @@ import com.google.appengine.api.users.UserServiceFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
 import com.google.gson.Gson;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.google.sps.servlets.Metadata;
+import com.google.sps.servlets.DatastoreMetadataStore;
 
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
 @WebServlet("/dataset-names")
@@ -41,24 +42,13 @@ public class DatasetNamesServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Query query = new Query("MetaData").addSort("timestamp", SortDirection.ASCENDING);
-
-    /* Get current user logged in to webapp */
+    // Get current user logged in to webapp
     UserService userService = UserServiceFactory.getUserService();
     String userEmail = userService.getCurrentUser().getEmail();
 
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    PreparedQuery results = datastore.prepare(query);
-
-    List<String> userDatasets = new ArrayList<String>();
-    for (Entity entity : results.asIterable()) {
-      String email = (String) entity.getProperty("user-email");
-      if (email.equals(userEmail)) {
-        // Get this the dataset-name for this entry and store it
-        String dataset = (String) entity.getProperty("dataset-name"); 
-        userDatasets.add(dataset);
-      }
-    }
+    // Get the logged in user's datasets
+    DatastoreMetadataStore datastoreStorage = new DatastoreMetadataStore();
+    List<String> userDatasets = datastoreStorage.getUsersDatasets(userEmail);
 
     // Convert userDatasets to exportable json format
     String json = GSON.toJson(userDatasets);

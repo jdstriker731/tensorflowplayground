@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,6 +39,9 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import java.nio.file.Paths;
 
+import com.google.sps.servlets.Metadata;
+import com.google.sps.servlets.DatastoreMetadataStore;
+
 /** Servlet for uploading files. */
 @WebServlet("/upload")
 @MultipartConfig
@@ -52,37 +55,26 @@ public class UploadServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-    //  Get all the Dataset Entities
-    Query query = new Query("MetaData").addSort("timestamp", SortDirection.ASCENDING);
-
-    /* Get current user logged in to webapp */
+    // Get current user logged in to webapp
     UserService userService = UserServiceFactory.getUserService();
-
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    PreparedQuery results = datastore.prepare(query);
 
     /*  Get metadata (for comparison and eventual storage) */
     String userEmail = userService.getCurrentUser().getEmail();
     String datasetName = request.getParameter("dataset-namer");
     long timestamp = System.currentTimeMillis();
 
+    // Create new instance of DatastoreMetadatastore class 
+    DatastoreMetadataStore datastoreStorage = new DatastoreMetadataStore();
+    boolean datasetExists = datastoreStorage.metadataExists(datasetName, userEmail);
 
-    for (Entity entity : results.asIterable()) {
-      String email = (String) entity.getProperty("user-email");
-      String dataset = (String) entity.getProperty("dataset-name");
-
-      if (email.equals(userEmail)) {
-        if (dataset.equals(datasetName)) {
-          // This dataset already exists for the user
-          response.sendRedirect("/already_exists.html");
-          return;
-        }
-      }
+    if (datasetExists) {
+      response.sendRedirect("/already_exists.html");
+      return;
     }
 
     /* Upload images from form to GCP bucket */
 
-    int imageCount = 0;
+    long imageCount = 0;
 
     Storage storage = StorageOptions.newBuilder().setProjectId(PROJECT_ID).build().getService();
 
@@ -114,23 +106,13 @@ public class UploadServlet extends HttpServlet {
       imageCount++;
     }
     
-    /* Store metadata in Datastore */
-    Entity datasetEntity = new Entity("MetaData");
-    datasetEntity.setProperty("user-email", userEmail);
-    datasetEntity.setProperty("dataset-name", datasetName);
-    datasetEntity.setProperty("model", "DELG");
-    datasetEntity.setProperty("visualizer-type", "t-SNE");
-    datasetEntity.setProperty("image-count", imageCount);
-    datasetEntity.setProperty("timestamp", timestamp);
-    datastore.put(datasetEntity);
+    // Create new Metadata Object
+    Metadata newMetadata = new Metadata(userEmail, datasetName, "DELG", "t-SNE", imageCount, timestamp);
+
+    // Store newData within Datastore
+    datastoreStorage.storeData(newMetadata);
 
     /* Redirect user */
     response.sendRedirect("/index.html");
-  }
-
-  private void createBucketSubDirectory(String path, Storage storageLocation, String bucket) {
-    BlobId blobId = BlobId.of(bucket, path);
-    BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
-    storageLocation.create(blobInfo);
   }
 }
