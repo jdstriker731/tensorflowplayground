@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Used to create a spritesheet from the given thumbnail.
+"""Used to create a spritesheet from the given thumbnails.
 
 This Cloud Function runs to create a spritesheet of all the thumbnails
 that have been uploaded to the bucket. The function checks to make sure
@@ -30,12 +30,13 @@ import numpy as np
 import cv2
 import json
 
-# initiating the storage & datastore clients
+# Initiating the storage & datastore clients.
 storage_client = storage.Client()
 datastore_client = datastore.Client('step-2020-johndallard')
 vision_client = vision.ImageAnnotatorClient()
-BUCKET_NAME = 'embeddings_visualizer_output_bucket'
+bucket_name = 'embeddings_visualizer_output_bucket'
 spritesheet_folder_name = 'spritesheets'
+SPRITESHEET = 'spritesheet'
 
 
 def create_spritesheet(file_data, context):
@@ -68,12 +69,12 @@ def create_spritesheet(file_data, context):
     user_name, dataset_name = get_user_and_dataset_name(file_name)
 
     spritesheet_file_name = (os.path.join(user_name, dataset_name,
-                                          spritesheet_folder_name, 'spritesheet'))
+                                          spritesheet_folder_name, SPRITESHEET))
 
     # We check to make sure the image is does not have the same name as the
     # spritesheet, so that when we upload the spritesheet the function
     # doesn't run again
-    if 'spritesheet' in file_name or '.npy' in file_name:
+    if SPRITESHEET in file_name or '.npy' in file_name:
         return
     spritesheet_file_name = spritesheet_file_name + '.png'
 
@@ -86,11 +87,14 @@ def create_spritesheet(file_data, context):
     num_expected_thumbnails = get_expected_thumbnail_number(metadata)
 
     # Check the amount of images already in the bucket from the dataset
-    folder = '/'.join(file_name.split('/')[:-1])
+    folder = os.path.join('/', file_name.split('/')[:-1])
     thumbnail_file_names = sorted(list_blobs_with_prefix(BUCKET_NAME, folder))
     num_actual_thumbnails = len(thumbnail_file_names)
 
     # Compare the number of actual thumbnails to expected.
+    # Since this cloud function runs every time something is
+    # uploaded, the function checks to make sure all thumbnails
+    # are there.
     if num_actual_thumbnails < num_expected_thumbnails:
         return
 
@@ -183,7 +187,12 @@ def list_blobs_with_prefix(bucket_name, prefix, delimiter=None):
     """
     blobs = storage_client.list_blobs(
         bucket_name, prefix=prefix, delimiter=delimiter)
+
+    # We check to see if there is a '.' extension, to ensure that
+    # an actual file is being uploaded, not a folder since the
+    # function runs every time something is uploaded 
     return [blob.name for blob in blobs if '.' in blob.name]
+    print (blob.name for blob in blobs if '.' in blob.name)
 
 
 def get_user_and_dataset_name(file_name):
@@ -226,7 +235,6 @@ def get_metadata(user, dataset_name):
     query.add_filter('user-email', '=', user)
     query.add_filter('dataset-name', '=', dataset_name)
     result = list(query.fetch())
-    print(result[0])
     return result[0] if len(result) >= 1 else None
 
 
@@ -249,4 +257,3 @@ def get_photo_name(file_name):
     print(f'Parts: {parts}')
     photo_name = parts[-1]
     return photo_name
-    print(photo_name)

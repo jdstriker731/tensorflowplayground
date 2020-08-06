@@ -21,7 +21,7 @@ PREFIX = 'bosticc@google.com/coolest_man_alive/original_images/'
 
 # todo... add more tests.. wanted to get a pr in.
 
-# This functions tests for the correct photo name of the file
+# This functions tests for the correct metadata retrieval of the file
 def test_metadata_retrieval(capsys):
     key = 'image-count:',
     number = '1'
@@ -35,6 +35,36 @@ def test_metadata_retrieval(capsys):
     out, err = capsys.readouterr()
     # This is the key for the object created in storage
     assert key, number in out
+
+# This function checks to make sure a failed metadata retrieval
+# returns nothing
+def test_failed_metadata_retrieval(capsys):
+    key = 'image-count:',
+    number = '1'
+
+    context = mock.MagicMock()
+    context.event_id = 'step-2020-johndallard'
+    context.event_type = 'gcs-event'
+
+    # Call tested function
+    create_spritesheet.get_metadata('', 'coolest_man_alive')
+    out, err = capsys.readouterr()
+    # This is the key for the object created in storage
+    assert '' in out
+
+# This function checks to make sure we get the correct
+# user and dataset name
+def test_user_and_dataset(capsys):
+
+    context = mock.MagicMock()
+    context.event_id = 'step-2020-johndallard'
+    context.event_type = 'gcs-event'
+
+    # Call tested function
+    create_spritesheet.get_user_and_dataset_name(NAME)
+    out, err = capsys.readouterr()
+    # This is the key for the object created in storage
+    assert 'bosticc@google.com' in out
 
 
 # This functions tests for the correct photo name of the file
@@ -61,3 +91,15 @@ def test_load_image(capsys):
     create_spritesheet.load_image('', bucket_name)
     out, err = capsys.readouterr()
     assert 'Cant find that photo' in out
+
+# This functions tests for the correct photo name of the file
+def test_failed_photo_name(capsys):
+    context = mock.MagicMock()
+    context.event_id = 'step-2020-johndallard'
+    context.event_type = 'gcs-event'
+
+    # Call tested function
+    create_spritesheet.get_photo_name('')
+    out, err = capsys.readouterr()
+    assert '' in out
+
