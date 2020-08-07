@@ -7,7 +7,7 @@ const RANDOM_FACTOR = 700;
 const DEFAULT_Z = -400;
 
 // Class to represent a single image in the dataset with width and height
-class ImageParams {
+export class ImageParams {
   constructor(size) {
     this.width = size;
     this.height = size;
@@ -16,7 +16,7 @@ class ImageParams {
 
 // An atlas represents a spritesheet image, and is used to iterate over each image
 // in the dataset.
-class Atlas {
+export class Atlas {
   constructor(image, numImages, numRows, numColumns) {
     this.image = image;
     this.width = image.width * numColumns;
@@ -26,7 +26,7 @@ class Atlas {
 }
 
 // Class to represent a point in 3D space with x, y, and z coords
-class Point {
+export class Point {
   // If x, y, and z coordinates are given, these are assigned to the new Point
   // If x, y, and z values are not present, random values are generated
   // This allows for default construction
@@ -58,7 +58,7 @@ class Point {
 
 // Atlas geometry is the geometry that holds all the images in a dataset
 // It is textured with the spritesheet to create a mesh
-class AtlasGeometry extends three.Geometry {
+export class AtlasGeometry extends three.Geometry {
   constructor(atlas, points) {
     super();
 
@@ -149,19 +149,30 @@ export class ThreeRenderer extends React.Component {
     this.light = undefined;
   }
 
-  // Loads json object for dataset and renders the object
-  async initPoints(material) {
-    var numImages = 0;
-    const numRows = 1;
-
+  // Loads JSON data from 
+  async loadPointsJson() {
     const json_url = '/coordinates-retrieval?dataset='.concat(this.dataset);
     const result = await fetch(json_url);
     const out = await result.json();
 
-    const points = out['points'].map((point_json) => {
+    return out;
+  }
+
+  parsePoints(jsonData) {
+    const points = jsonData['points'].map((point_json) => {
       const {x, y, z} = point_json;
       return new Point(x, y, z);
     });
+
+    return points;
+  }
+
+  // Loads json object for dataset and renders the object
+  initPoints(json) {
+    var numImages = 0;
+    const numRows = 1;
+
+    const points = this.parsePoints(json);
     
     numImages = points.length;
     const numColumns = numImages;
@@ -218,7 +229,6 @@ export class ThreeRenderer extends React.Component {
     this.renderer = new three.WebGLRenderer({antialias: true, canvas: this.canvas});
     this.renderer.setSize(800, 800);
 
-
     this.camera = this.createCamera();
     this.scene = new three.Scene();
     this.light = new three.PointLight(0xffffff, 0.7, 0);
@@ -237,7 +247,8 @@ export class ThreeRenderer extends React.Component {
     this.material.side = three.DoubleSide;
 
     // Initialize points and render
-    this.initPoints();
+    const jsonOut = this.loadPointsJson();
+    this.initPoints(jsonOut);
   }
 
   render(){
