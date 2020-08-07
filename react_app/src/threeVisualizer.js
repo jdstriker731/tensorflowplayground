@@ -3,8 +3,6 @@ import React from 'react';
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
 
 const IMAGE_SIZE = 64;
-const RANDOM_FACTOR = 700;
-const DEFAULT_Z = -400;
 
 // Class to represent a single image in the dataset with width and height
 export class ImageParams {
@@ -27,32 +25,10 @@ export class Atlas {
 
 // Class to represent a point in 3D space with x, y, and z coords
 export class Point {
-  // If x, y, and z coordinates are given, these are assigned to the new Point
-  // If x, y, and z values are not present, random values are generated
-  // This allows for default construction
   constructor(x, y, z) {
-    function randomInt() {
-      const val = Math.random() * RANDOM_FACTOR;
-      return Math.random() > 0.5 ? -val : val;
-    }
-
-    if (x == undefined) {
-      this.x = randomInt();
-    } else {
-      this.x = x;
-    }
-
-    if (y == undefined) {
-      this.y = randomInt();
-    } else {
-      this.y = y;
-    }
-
-    if (z == undefined) {
-      this.z = DEFAULT_Z;
-    } else {
-      this.z = z;
-    }
+    this.x = x;
+    this.y = y;
+    this.z = z;
   }
 }
 
