@@ -60,7 +60,7 @@
         <artifactId>appengine-maven-plugin</artifactId>
         <version>2.2.0</version>
         <configuration>
-          <deploy.projectId>step-2020-johndallard</deploy.projectId>
+          <!-- <deploy.projectId>[PROJECT ID HERE]</deploy.projectId> -->
         </configuration>
       </plugin>
     </plugins>
