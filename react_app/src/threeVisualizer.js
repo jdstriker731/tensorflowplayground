@@ -138,6 +138,8 @@ export class ThreeRenderer extends React.Component {
     this.canvasWidth = props.canvasWidth;
     this.canvasHeight = props.canvasHeight;
 
+    this.render3dFn_ = this.render3d.bind(this);
+
     this.camera = undefined;
     this.scene = undefined;
     this.controls = undefined;
@@ -171,15 +173,15 @@ export class ThreeRenderer extends React.Component {
     const mesh = new three.Mesh(geometry, this.material);
     mesh.position.set(0, 0, 0);
     this.scene.add(mesh);
-
-    const component = this;
-    function render3d() {
-      component.renderer.render(component.scene, component.camera);
-      requestAnimationFrame(render3d);
-      component.controls.update();
-    }
   
-    render3d();
+    this.render3dFn_();
+  }
+
+  // Renders the elements in 3D space
+  render3d() {
+    this.renderer.render(this.scene, this.camera);
+    requestAnimationFrame(this.render3dFn_);
+    this.controls.update();
   }
 
   // Appends a new canvas element to this.mount
