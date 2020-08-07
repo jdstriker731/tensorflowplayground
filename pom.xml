@@ -103,7 +103,6 @@
         <configuration>
           <!-- TODO: set project ID. -->
           <!-- <deploy.projectId>[PROJECT_ID]</deploy.projectId> -->
-          <deploy.projectId>step-2020-johndallard</deploy.projectId>
         </configuration>
       </plugin>
     </plugins>
