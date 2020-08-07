@@ -15,91 +15,35 @@
 from unittest import mock
 from google.cloud import storage, datastore
 import create_spritesheet
+import os
+import tempfile
+import numpy as np
 
 NAME = 'bosticc@google.com/coolest_man_alive/original_images/myles_hun.jpg'
 PREFIX = 'bosticc@google.com/coolest_man_alive/original_images/'
 
-# todo... add more tests.. wanted to get a pr in.
-
-# This functions tests for the correct metadata retrieval of the file
-def test_metadata_retrieval(capsys):
-    key = 'image-count:',
-    number = '1'
-
-    context = mock.MagicMock()
-    context.event_id = 'step-2020-johndallard'
-    context.event_type = 'gcs-event'
-
-    # Call tested function
-    create_spritesheet.get_metadata('bosticc@google.com', 'coolest_man_alive')
-    out, err = capsys.readouterr()
-    # This is the key for the object created in storage
-    assert key, number in out
-
-# This function checks to make sure a failed metadata retrieval
-# returns nothing
-def test_failed_metadata_retrieval(capsys):
-    key = 'image-count:',
-    number = '1'
-
-    context = mock.MagicMock()
-    context.event_id = 'step-2020-johndallard'
-    context.event_type = 'gcs-event'
-
-    # Call tested function
-    create_spritesheet.get_metadata('', 'coolest_man_alive')
-    out, err = capsys.readouterr()
-    # This is the key for the object created in storage
-    assert '' in out
-
-# This function checks to make sure we get the correct
-# user and dataset name
-def test_user_and_dataset(capsys):
-
-    context = mock.MagicMock()
-    context.event_id = 'step-2020-johndallard'
-    context.event_type = 'gcs-event'
-
-    # Call tested function
-    create_spritesheet.get_user_and_dataset_name(NAME)
-    out, err = capsys.readouterr()
-    # This is the key for the object created in storage
-    assert 'bosticc@google.com' in out
+storage_client = storage.Client()
+datastore_client = datastore.Client('step-2020-johndallard')
 
 
-# This functions tests for the correct photo name of the file
-def test_photo_name(capsys):
-    context = mock.MagicMock()
-    context.event_id = 'step-2020-johndallard'
-    context.event_type = 'gcs-event'
+# This functions tests for a blank dataset name of the file, and if there is no
+# dataset name none should be returned from the function
+def test_slashes_at_end(capsys):
+    multiple_slashes_at_end = 'bosticc@google.com///'
+    correct_tuple = ('bosticc@google.com', 'No dataset found')
+    assert create_spritesheet.get_user_and_dataset_name(
+        multiple_slashes_at_end) == (correct_tuple)
 
-    # Call tested function
-    create_spritesheet.get_photo_name(NAME)
-    out, err = capsys.readouterr()
-    assert 'myles_hun.jpg' in out
+# This functions tests for multiple slashes between the dataset name and user n
+# ame. 
+def test_too_many_slashes_name(capsys):
+    slash_name_1 = 'bosticc@google.com//coolest_man_alive/original_images/my.jpg'
+    correct_tuple = ('bosticc@google.com', 'coolest_man_alive')
+    assert create_spritesheet.get_user_and_dataset_name(slash_name_1) == (
+        correct_tuple)
 
-
-# We test to make sure if we have a empty directory
-# that the function terminates
-def test_load_image(capsys):
-    bucket_name ='embeddings_visualizer_output_bucket'
-    context = mock.MagicMock()
-    context.event_id = 'step-2020-johndallard'
-    context.event_type = 'gcs-event'
-
-    # Call tested function
-    create_spritesheet.load_image('', bucket_name)
-    out, err = capsys.readouterr()
-    assert 'Cant find that photo' in out
-
-# This functions tests for the correct photo name of the file
-def test_failed_photo_name(capsys):
-    context = mock.MagicMock()
-    context.event_id = 'step-2020-johndallard'
-    context.event_type = 'gcs-event'
-
-    # Call tested function
-    create_spritesheet.get_photo_name('')
-    out, err = capsys.readouterr()
-    assert '' in out
-
+# This function tests to make sure if a slash is at the end of the file then re
+# turn the last name in the file as the photo name 
+def test_blank_photo_name(capsys):
+    blank_name = 'bosticc/coolest_man_alive/original_images/myles.jpg/'
+    assert create_spritesheet.get_photo_name(blank_name) == 'myles.jpg'

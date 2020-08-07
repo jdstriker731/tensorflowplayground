@@ -34,8 +34,8 @@ import json
 storage_client = storage.Client()
 datastore_client = datastore.Client('step-2020-johndallard')
 vision_client = vision.ImageAnnotatorClient()
-bucket_name = 'embeddings_visualizer_output_bucket'
-spritesheet_folder_name = 'spritesheets'
+BUCKET_NAME = 'embeddings_visualizer_output_bucket'
+SPRITESHEET_FOLDER_NAME = 'spritesheets'
 SPRITESHEET = 'spritesheet'
 
 
@@ -55,14 +55,6 @@ def create_spritesheet(file_data, context):
         A dict mapping keys to the corresponding table row data
         fetched. Each row is represented as a tuple of strings. For
         example:
-
-        {b'Serak': ('Rigel VII', 'Preparer'),
-         b'Zim': ('Irk', 'Invader'),
-         b'Lrrr': ('Omicron Persei 8', 'Emperor')}
-
-        Returned keys are always bytes.  If a key from the keys argument is
-        missing from the dictionary, then that row was not found in the
-        table (and require_all_keys must have been False).
     """
 
     file_name = file_data['name']
@@ -71,14 +63,14 @@ def create_spritesheet(file_data, context):
     spritesheet_file_name = (os.path.join(user_name, dataset_name,
                                           spritesheet_folder_name, SPRITESHEET))
 
-    # We check to make sure the image is does not have the same name as the
-    # spritesheet, so that when we upload the spritesheet the function
-    # doesn't run again
+    # We check to make sure the image is does not have the same name as the spr
+    # itesheet, so that when we upload the spritesheet the function doesn't run
+    # again
     if SPRITESHEET in file_name or '.npy' in file_name:
         return
     spritesheet_file_name = spritesheet_file_name + '.png'
 
-    # Check to make sure there is metadata, if none return no data and error 
+    # Check to make sure there is metadata, if none return no data and error
     # message
     metadata = get_metadata(user_name, dataset_name)
     if metadata is None:
@@ -91,10 +83,9 @@ def create_spritesheet(file_data, context):
     thumbnail_file_names = sorted(list_blobs_with_prefix(BUCKET_NAME, folder))
     num_actual_thumbnails = len(thumbnail_file_names)
 
-    # Compare the number of actual thumbnails to expected.
-    # Since this cloud function runs every time something is
-    # uploaded, the function checks to make sure all thumbnails
-    # are there.
+    # Compare the number of actual thumbnails to expected. Since this cloud fun
+    # ction runs every time something is uploaded, the function checks to make
+    # sure all thumbnails are there.
     if num_actual_thumbnails < num_expected_thumbnails:
         return
 
@@ -161,10 +152,13 @@ def save_image(bucket_name, file_name, image):
     storage_client.bucket(bucket_name).blob(file_name).upload_from_filename(
         tmp_file_name)
     os.remove(tmp_file_name)
+    print(image)
+    return image
 
 
 def get_expected_thumbnail_number(dataset):
-    dataset_name, images_count_tuple, model, timestamp, user, viz_type = sorted(dataset.items())
+    dataset_name, images_count_tuple, model, timestamp, user, viz_type = sorted(
+        dataset.item)()
     return images_count_tuple[1]
 
 
@@ -188,18 +182,17 @@ def list_blobs_with_prefix(bucket_name, prefix, delimiter=None):
     blobs = storage_client.list_blobs(
         bucket_name, prefix=prefix, delimiter=delimiter)
 
-    # We check to see if there is a '.' extension, to ensure that
-    # an actual file is being uploaded, not a folder since the
-    # function runs every time something is uploaded 
+    # We check to see if there is a '.' extension, to ensure that an actual fil
+    # e is being uploaded, not a folder since the function runs every time some
+    # thing is uploaded
     return [blob.name for blob in blobs if '.' in blob.name]
-    print (blob.name for blob in blobs if '.' in blob.name)
 
 
 def get_user_and_dataset_name(file_name):
     """Gets the name of the user and the dataset uploaded.
 
-    Returns the user and dataset name in a tuple by splitting the
-    upload file path.
+    Returns the user and dataset name in a tuple by splitting the upload file p
+    ath.
 
     Args:
         file_name:
@@ -212,14 +205,22 @@ def get_user_and_dataset_name(file_name):
     print(f'Parts: {parts}')
     user = parts[0]
     dataset_name = parts[1]
-    return user, dataset_name
+
+    # If the area after the second slash (where the datastore name should be) i
+    # s empty, then look through the rest of the string until there is a name a
+    # vailable if not then just return the user. The while loop ends when there
+    # is a string that is not empty, meaning there is a name there
+    i = 1
+    while not parts[i] and i < len(parts) - 1:
+        i = i + 1
+    return user, parts[i] if len(parts[i]) > 0 else 'No dataset found'
 
 
 def get_metadata(user, dataset_name):
     """Gets the metadata of the specific upload.
 
-    Checks datastore for an the latest entity that matches
-    the name of the user and dataset name.
+    Checks datastore for an the latest entity that matches the name of the user
+    and dataset name.
 
     Args:
         user:
@@ -243,7 +244,8 @@ def get_photo_name(file_name):
 
     Splits slases in file_name string and returns the last
     element, which is the name of the image and it's
-    extension.
+    extension. If there is no photo found after the last /, then return the str
+    ing before
 
     Args:
         file_name:
@@ -255,5 +257,9 @@ def get_photo_name(file_name):
     print(f'File name: {file_name}')
     parts = file_name.split('/')
     print(f'Parts: {parts}')
-    photo_name = parts[-1]
-    return photo_name
+
+    # If there is no name after the last slash, take the name before the last s
+    # lash 
+    if not parts[-1]:
+        return parts[-2]
+    return parts[-1]
