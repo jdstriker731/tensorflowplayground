@@ -60,9 +60,16 @@ public class DatastoreMetadataStore implements MetadataStore {
    */
   public Metadata retrieveMetadata(String datasetName) {
     // Check to see if any entity has the same matching dataset name
-    for (Entity entity : getAllDatastoreEntities().asIterable()) {
-      String dataset = (String) entity.getProperty("dataset-name");
+    Filter propertyFilter = new FilterPredicate("dataset-name", FilterOperator.EQUAL, datasetName);
 
+    Query query = new Query("MetaData").setFilter(propertyFilter);
+    
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    PreparedQuery results = datastore.prepare(query);
+
+    for (Entity entity : results.asIterable()) {
+      String dataset = (String) entity.getProperty("dataset-name");
+      
       if (dataset.equals(datasetName)) {
         // Get the remaining properties
         String email = (String) entity.getProperty("user-email");
