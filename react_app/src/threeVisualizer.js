@@ -3,7 +3,10 @@ import React from 'react';
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
 
 const IMAGE_SIZE = 64;
+const RANDOM_FACTOR = 700;
+const DEFAULT_Z = -400;
 
+// Class to represent a single image in the dataset with width and height
 class ImageParams {
   constructor(size) {
     this.width = size;
@@ -11,6 +14,8 @@ class ImageParams {
   }
 }
 
+// An atlas represents a spritesheet image, and is used to iterate over each image
+// in the dataset.
 class Atlas {
   constructor(image, numImages, numRows, numColumns) {
     this.image = image;
@@ -20,10 +25,14 @@ class Atlas {
   }
 }
 
+// Class to represent a point in 3D space with x, y, and z coords
 class Point {
+  // If x, y, and z coordinates are given, these are assigned to the new Point
+  // If x, y, and z values are not present, random values are generated
+  // This allows for default construction
   constructor(x, y, z) {
     function randomInt() {
-      const val = Math.random() * 700;
+      const val = Math.random() * RANDOM_FACTOR;
       return Math.random() > 0.5 ? -val : val;
     }
 
@@ -40,21 +49,26 @@ class Point {
     }
 
     if (z == undefined) {
-      this.z = -400;
+      this.z = DEFAULT_Z;
     } else {
       this.z = z;
     }
   }
 }
 
+// Atlas geometry is the geometry that holds all the images in a dataset
+// It is textured with the spritesheet to create a mesh
 class AtlasGeometry extends three.Geometry {
   constructor(atlas, points) {
     super();
 
     for (var i = 0; i < atlas.numImages; i++) {
       // Create x, y, z coords for this subimage
+      // Coords technically don't represent the center of the image
+      // However this doesn't affect output because all images are the same size
       const coords = points[i];
 
+      // 3D vertices of the image thumbnails
       this.vertices.push(
         new three.Vector3(coords.x, coords.y, coords.z),
         new three.Vector3(coords.x + atlas.image.width, coords.y, coords.z),
@@ -113,7 +127,9 @@ class AtlasGeometry extends three.Geometry {
   }
 }
 
+// Class to render AtlasGeometry and allow for interactivity
 export class ThreeRenderer extends React.Component {
+  // Set defaults and declare members
   constructor(props) {
     super(props);
 
@@ -131,7 +147,7 @@ export class ThreeRenderer extends React.Component {
     this.light = undefined;
   }
 
-  // Loads json object for dataset and returns array of points
+  // Loads json object for dataset and renders the object
   async initPoints(material) {
     var numImages = 0;
     const numRows = 1;
@@ -193,6 +209,7 @@ export class ThreeRenderer extends React.Component {
     return camera;
   }
 
+  // Handle Three render code when the component mounts to the react DOM
   componentDidMount() {
     this.canvas = this.createCanvas();
 
@@ -217,8 +234,7 @@ export class ThreeRenderer extends React.Component {
 
     this.material.side = three.DoubleSide;
 
-    // Create list of (random) points to map images to
-    // Later on, this will be t-SNE coordinates
+    // Initialize points and render
     this.initPoints();
   }
 

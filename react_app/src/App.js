@@ -7,7 +7,7 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = { datasets: [],
-                    selectedDataset: "" };
+                    selectedDataset:  '' };
     this.fetchUserDatasets = this.fetchUserDatasets.bind(this);
     this.selectionCallback = this.selectionCallback.bind(this);
   }
@@ -15,7 +15,7 @@ export default class App extends React.Component {
   selectionCallback(selection) {
     this.setState(() => {
       return {selectedDataset: selection};
-      }, () => {console.log("dataset set to: " + selection)});
+      }, () => {console.log('dataset set to: ' + selection)});
   }
 
     
@@ -24,7 +24,7 @@ export default class App extends React.Component {
   }
 
   fetchUserDatasets() {
-    fetch("/dataset-names").then(response => response.json()).then(userDatasets => {
+    fetch('/dataset-names').then(response => response.json()).then(userDatasets => {
       // Store the names of the datasets the user has made
       this.setState({ datasets: userDatasets });
     });
