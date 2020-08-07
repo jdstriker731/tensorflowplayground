@@ -52,9 +52,6 @@ public class DatastoreMetadataStoreTest {
   private Entity datasetEntity5;
   private Entity datasetEntity6;
   private Entity datasetEntity7;
-  private Entity datasetEntity8;
-  private Entity datasetEntity9;
-  private Entity datasetEntity10;
 
   // Sample metadata information for an entry in Datastore
   private static final String USER = "johndallard@google.com";
@@ -79,29 +76,12 @@ public class DatastoreMetadataStoreTest {
   }
   
   @Test
-  public void testNumberOfDatastoreEntities() {
-    // Test to show that the correct number of entities end up in datastore
-
-    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-    Metadata metadata = Metadata.of(USER, DATASET, MODEL, VISUALIZATION, NUMBER_OF_IMAGES, TIMESTAMP);
-    datastoreStorage.storeData(metadata);
-    Assert.assertEquals(11, ds.prepare(new Query("MetaData")).countEntities(withLimit(20)));
-  }
-  
-  @Test
   public void basicMetadataRetrieval() {
     // Test to show correct metadata retrieval for a particular dataset
 
     Metadata metadata = Metadata.of(USER, DATASET, MODEL, VISUALIZATION, NUMBER_OF_IMAGES, TIMESTAMP);
     datastoreStorage.storeData(metadata);
-    Metadata retrievedMetadata = datastoreStorage.retrieveMetadata("my_test_dataset");
-
-    Assert.assertEquals(USER, retrievedMetadata.user());
-    Assert.assertEquals(DATASET, retrievedMetadata.dataset());
-    Assert.assertEquals(MODEL, retrievedMetadata.model());
-    Assert.assertEquals(VISUALIZATION, retrievedMetadata.visualization());
-    Assert.assertEquals(NUMBER_OF_IMAGES, retrievedMetadata.numberOfImages());
-    Assert.assertEquals(TIMESTAMP, retrievedMetadata.timestamp());
+    Assert.assertEquals(metadata, datastoreStorage.retrieveMetadata(metadata.dataset()));
   }
   
   @Test
@@ -227,29 +207,6 @@ public class DatastoreMetadataStoreTest {
     datasetEntity7.setProperty("image-count", 77);
     datasetEntity7.setProperty("timestamp", 1596668419537L);
 
-    datasetEntity8 = new Entity("MetaData");
-    datasetEntity8.setProperty("user-email", "bosticc@google.com");
-    datasetEntity8.setProperty("dataset-name", "dataset_eight");
-    datasetEntity8.setProperty("model", "DELG");
-    datasetEntity8.setProperty("visualizer-type", "t-SNE");
-    datasetEntity8.setProperty("image-count", 12);
-    datasetEntity8.setProperty("timestamp", 1596324246677L);
-
-    datasetEntity9 = new Entity("MetaData");
-    datasetEntity9.setProperty("user-email", "askewc@google.com");
-    datasetEntity9.setProperty("dataset-name", "dataset_nine");
-    datasetEntity9.setProperty("model", "DELG");
-    datasetEntity9.setProperty("visualizer-type", "t-SNE");
-    datasetEntity9.setProperty("image-count", 93);
-    datasetEntity9.setProperty("timestamp", 1596306297383L);
-
-    datasetEntity10 = new Entity("MetaData");
-    datasetEntity10.setProperty("user-email", "zkim@google.com");
-    datasetEntity10.setProperty("dataset-name", "dataset_ten");
-    datasetEntity10.setProperty("model", "DELG");
-    datasetEntity10.setProperty("visualizer-type", "t-SNE");
-    datasetEntity10.setProperty("image-count", 21);
-    datasetEntity10.setProperty("timestamp", 1596642420849L);
     
     // Place entities in emulated Datastore
     ds.put(datasetEntity1);
@@ -259,8 +216,5 @@ public class DatastoreMetadataStoreTest {
     ds.put(datasetEntity5);
     ds.put(datasetEntity6);
     ds.put(datasetEntity7);
-    ds.put(datasetEntity8);
-    ds.put(datasetEntity9);
-    ds.put(datasetEntity10);
   }
 }
