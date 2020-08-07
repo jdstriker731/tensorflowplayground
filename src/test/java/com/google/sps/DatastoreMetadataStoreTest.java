@@ -88,7 +88,6 @@ public class DatastoreMetadataStoreTest {
     Assert.assertEquals(11, ds.prepare(new Query("MetaData")).countEntities(withLimit(20)));
   }
   
-  
   @Test
   public void basicMetadataRetrieval() {
     // Test to show correct metadata retrieval for a particular dataset
@@ -105,7 +104,6 @@ public class DatastoreMetadataStoreTest {
     Assert.assertEquals(TIMESTAMP, retrievedMetadata.timestamp());
   }
   
-  
   @Test
   public void retrieveNonexistantMetadata() {
     // Test to show what happens when a dataset doesn't exist
@@ -113,7 +111,6 @@ public class DatastoreMetadataStoreTest {
     Metadata metadata = datastoreStorage.retrieveMetadata("non_existant_dataset");
     Assert.assertEquals(null, metadata);
   }
-  
   
   @Test
   public void testRetrieveUsersDatasets() {
@@ -130,7 +127,6 @@ public class DatastoreMetadataStoreTest {
     Assert.assertEquals(testDatasetList, datastoreStorage.getUsersDatasets("johndallard@google.com"));
   }
 
-  
   @Test
   public void nonexistantUserDatasetsRetrieval() {
     // Test to show that nothing is returned when nonexistant user's
@@ -140,7 +136,6 @@ public class DatastoreMetadataStoreTest {
     Assert.assertEquals(emptyDatasetList, datastoreStorage.getUsersDatasets("myfake_email@gmail.com"));
   }
 
-  
   @Test
   public void datasetForUserExists() {
     // Test to show metadataExists() will return true when a 
@@ -156,7 +151,6 @@ public class DatastoreMetadataStoreTest {
 
     Assert.assertEquals(false, datastoreStorage.metadataExists("truly_fake_dataset", "johndee731@gmail.com"));
   }
-
   
   @Test
   public void userDoesNotHaveDataset() {

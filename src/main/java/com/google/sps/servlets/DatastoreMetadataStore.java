@@ -20,8 +20,9 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
+import com.google.appengine.api.datastore.Query.Filter;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,13 +83,10 @@ public class DatastoreMetadataStore implements MetadataStore {
    */
   public List<String> getUsersDatasets(String user) {
     List<String> userDatasets = new ArrayList<String>();
-    for (Entity entity : getAllDatastoreEntities().asIterable()) {
-      String email = (String) entity.getProperty("user-email");
-      if (email.equals(user)) {
-        // Get this the dataset-name for this entry and store it
-        String dataset = (String) entity.getProperty("dataset-name"); 
-        userDatasets.add(dataset);
-      }
+    for (Entity entity : getAllDatastoreEntitiesForUser(user).asIterable()) {
+      // Get this the dataset-name for this entry and store it
+      String dataset = (String) entity.getProperty("dataset-name"); 
+      userDatasets.add(dataset);
     }
     return userDatasets;
   }
@@ -121,6 +119,21 @@ public class DatastoreMetadataStore implements MetadataStore {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
     
+    return results;
+  }
+  
+  /**
+   * Retrieves all of the entities from Datastore for a particular user and 
+   * returns them in a PreparedQuery.
+   */
+  private static PreparedQuery getAllDatastoreEntitiesForUser(String user) {
+    Filter propertyFilter = new FilterPredicate("user-email", FilterOperator.EQUAL, user);
+
+    Query query = new Query("MetaData").setFilter(propertyFilter).addSort("timestamp", SortDirection.ASCENDING);
+    
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    PreparedQuery results = datastore.prepare(query);
+
     return results;
   }
 }
