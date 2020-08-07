@@ -10,14 +10,14 @@ class EmbeddingForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedValue: "",
+      selectedValue: '',
       createMode: false
     };
 
-    this.setSelection = this.setSelection.bind(this);
-    this.submitSelection = this.submitSelection.bind(this);
-    this.showModal = this.showModal.bind(this);
-    this.hideModal = this.hideModal.bind(this);
+    this.setSelectionFn_ = this.setSelection.bind(this);
+    this.submitSelectionFn_ = this.submitSelection.bind(this);
+    this.showModalFn_ = this.showModal.bind(this);
+    this.hideModalFn_ = this.hideModal.bind(this);
   }
 
   setSelection(event) {
@@ -43,14 +43,14 @@ class EmbeddingForm extends React.Component {
   render() {
     return (
       <div className="form-wrapper">
-        <CreationModal show={this.state.createMode} close={this.hideModal} />
+        <CreationModal show={this.state.createMode} close={this.hideModalFn_} />
         <button type="button" onClick={checkLoginStatus}>Login/Logout</button>
         <br />
         <div className="form">
           <div className="embedding-form">
               <label className="form-category">
                 <span className="category-title">Dataset:</span>
-                <select onChange={this.setSelection} name="dataset" id="dataset">
+                <select onChange={this.setSelectionFn_} name="dataset" id="dataset">
                   {this.props.userDatasets.map(value => (
                     <option className="form-option" key={value} value={value}>
                       {value}
@@ -58,7 +58,7 @@ class EmbeddingForm extends React.Component {
                   ))}
                 </select>
               </label>
-            <button onClick={this.submitSelection} className="form-submit">
+            <button onClick={this.submitSelectionFn_} className="form-submit">
               Submit
             </button>
           </div>
@@ -66,7 +66,7 @@ class EmbeddingForm extends React.Component {
         <button
           type="button"
           className="create-dataset-button"
-          onClick={this.showModal}
+          onClick={this.showModalFn_}
         >
           Create a new dataset
         </button>

@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as three from 'three';
 import React from 'react';
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
 
@@ -47,7 +47,7 @@ class Point {
   }
 }
 
-class AtlasGeometry extends THREE.Geometry {
+class AtlasGeometry extends three.Geometry {
   constructor(atlas, points) {
     super();
 
@@ -56,25 +56,25 @@ class AtlasGeometry extends THREE.Geometry {
       const coords = points[i];
 
       this.vertices.push(
-        new THREE.Vector3(coords.x, coords.y, coords.z),
-        new THREE.Vector3(coords.x + atlas.image.width, coords.y, coords.z),
-        new THREE.Vector3(
+        new three.Vector3(coords.x, coords.y, coords.z),
+        new three.Vector3(coords.x + atlas.image.width, coords.y, coords.z),
+        new three.Vector3(
           coords.x + atlas.image.width,
           coords.y + atlas.image.height,
           coords.z
         ),
-        new THREE.Vector3(coords.x, coords.y + atlas.image.height, coords.z)
+        new three.Vector3(coords.x, coords.y + atlas.image.height, coords.z)
       );
 
       // Add the first face (the lower-right triangle)
-      var faceOne = new THREE.Face3(
+      var faceOne = new three.Face3(
         this.vertices.length - 4,
         this.vertices.length - 3,
         this.vertices.length - 2
       );
 
       // Add the second face (the upper-left triangle)
-      var faceTwo = new THREE.Face3(
+      var faceTwo = new three.Face3(
         this.vertices.length - 4,
         this.vertices.length - 2,
         this.vertices.length - 1
@@ -97,17 +97,17 @@ class AtlasGeometry extends THREE.Geometry {
       // each row and column contains only 10 images) to specify
       // the regions of the current image
       this.faceVertexUvs[0].push([
-        new THREE.Vector2(xOffset, yOffset),
-        new THREE.Vector2(xOffset + (1.0 / atlas.numImages), yOffset),
-        new THREE.Vector2(xOffset + (1.0 / atlas.numImages), yOffset + 1.0)
+        new three.Vector2(xOffset, yOffset),
+        new three.Vector2(xOffset + (1.0 / atlas.numImages), yOffset),
+        new three.Vector2(xOffset + (1.0 / atlas.numImages), yOffset + 1.0)
       ]);
 
       // Map the region of the image described by the lower-left,
       // upper-right, and upper-left vertices to `faceTwo`
       this.faceVertexUvs[0].push([
-        new THREE.Vector2(xOffset, yOffset),
-        new THREE.Vector2(xOffset + (1.0 / atlas.numImages), yOffset + 1.0),
-        new THREE.Vector2(xOffset, yOffset + 1.0)
+        new three.Vector2(xOffset, yOffset),
+        new three.Vector2(xOffset + (1.0 / atlas.numImages), yOffset + 1.0),
+        new three.Vector2(xOffset, yOffset + 1.0)
       ]);
     }
   }
@@ -136,7 +136,7 @@ export class ThreeRenderer extends React.Component {
     var numImages = 0;
     const numRows = 1;
 
-    const json_url = "/coordinates-retrieval?dataset=".concat(this.dataset);
+    const json_url = '/coordinates-retrieval?dataset='.concat(this.dataset);
     const result = await fetch(json_url);
     const out = await result.json();
 
@@ -152,7 +152,7 @@ export class ThreeRenderer extends React.Component {
 
     const geometry = new AtlasGeometry(atlas, points);
 
-    const mesh = new THREE.Mesh(geometry, this.material);
+    const mesh = new three.Mesh(geometry, this.material);
     mesh.position.set(0, 0, 0);
     this.scene.add(mesh);
 
@@ -182,7 +182,7 @@ export class ThreeRenderer extends React.Component {
     const aspect = 2; // the canvas default
     const nearClippingPlane = 0.1;
     const farClippingPlane = 10000;
-    const camera = new THREE.PerspectiveCamera(
+    const camera = new three.PerspectiveCamera(
       fov,
       aspect,
       nearClippingPlane,
@@ -196,26 +196,26 @@ export class ThreeRenderer extends React.Component {
   componentDidMount() {
     this.canvas = this.createCanvas();
 
-    this.renderer = new THREE.WebGLRenderer({antialias: true, canvas: this.canvas});
+    this.renderer = new three.WebGLRenderer({antialias: true, canvas: this.canvas});
     this.renderer.setSize(800, 800);
 
 
     this.camera = this.createCamera();
-    this.scene = new THREE.Scene();
-    this.light = new THREE.PointLight(0xffffff, 0.7, 0);
+    this.scene = new three.Scene();
+    this.light = new three.PointLight(0xffffff, 0.7, 0);
     this.light.position.set(1, 1, 100);
     this.scene.add(this.light);
 
     this.controls = new TrackballControls(this.camera, this.renderer.domElement);
 
-    this.loader = new THREE.TextureLoader();
+    this.loader = new three.TextureLoader();
 
     const img_query = '/spritesheet-retrieval?dataset='.concat(this.dataset);
-    this.material = new THREE.MeshBasicMaterial({
+    this.material = new three.MeshBasicMaterial({
       map: this.loader.load(img_query)
     });
 
-    this.material.side = THREE.DoubleSide;
+    this.material.side = three.DoubleSide;
 
     // Create list of (random) points to map images to
     // Later on, this will be t-SNE coordinates

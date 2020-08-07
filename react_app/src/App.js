@@ -31,7 +31,7 @@ export default class App extends React.Component {
   }
 
   datasetSelected() {
-    return this.state.selectedDataset !== "";
+    return !!this.state.selectedDataset;
   }
 
   render() {
