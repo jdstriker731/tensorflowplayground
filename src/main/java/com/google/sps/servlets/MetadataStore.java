@@ -16,9 +16,13 @@ package com.google.sps.servlets;
 
 import java.util.List;
 
+/**
+ * An interface that defines methods for interacting
+ * with some type of external database (ex: Datastore, Firestore, SQL)
+ */
 public interface MetadataStore {
-  abstract void storeData(Metadata data);
-  abstract Metadata retrieveMetadata(String datasetName);
-  abstract List<String> getUsersDatasets(String user);
-  abstract boolean metadataExists(String datasetName, String user);
+  public void storeData(Metadata data);
+  public Metadata retrieveMetadata(String datasetName);
+  public List<String> getUsersDatasets(String user);
+  public boolean metadataExists(String datasetName, String user);
 }

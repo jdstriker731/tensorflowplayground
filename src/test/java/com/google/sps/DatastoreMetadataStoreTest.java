@@ -63,11 +63,14 @@ public class DatastoreMetadataStoreTest {
   private static final String VISUALIZATION = "t-SNE";
   private static final int NUMBER_OF_IMAGES = 7;
   private static final long TIMESTAMP = 1596730599767L;
+
+  // Instance of DatastoreMetadatastore class 
+  private MetadataStore datastoreStorage = new DatastoreMetadataStore();
   
   @Before
   public void setUp() {
     helper.setUp();
-    setUpEntities();
+    setUpDatastore();
   }
 
   @After
@@ -75,26 +78,12 @@ public class DatastoreMetadataStoreTest {
     helper.tearDown();
   }
   
-  
   @Test
   public void testNumberOfDatastoreEntities() {
     // Test to show that the correct number of entities end up in datastore
-    
-    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-    // Add some entities to Datastore
-    ds.put(datasetEntity1);
-    ds.put(datasetEntity2);
-    ds.put(datasetEntity3);
-    ds.put(datasetEntity4);
-    ds.put(datasetEntity5);
-    ds.put(datasetEntity6);
-    ds.put(datasetEntity7);
-    ds.put(datasetEntity8);
-    ds.put(datasetEntity9);
-    ds.put(datasetEntity10);
 
-    Metadata metadata = new Metadata(USER, DATASET, MODEL, VISUALIZATION, NUMBER_OF_IMAGES, TIMESTAMP);
-    DatastoreMetadataStore datastoreStorage = new DatastoreMetadataStore();
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    Metadata metadata = Metadata.of(USER, DATASET, MODEL, VISUALIZATION, NUMBER_OF_IMAGES, TIMESTAMP);
     datastoreStorage.storeData(metadata);
     Assert.assertEquals(11, ds.prepare(new Query("MetaData")).countEntities(withLimit(20)));
   }
@@ -103,31 +92,17 @@ public class DatastoreMetadataStoreTest {
   @Test
   public void basicMetadataRetrieval() {
     // Test to show correct metadata retrieval for a particular dataset
-    
-    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-    // Add some entities to Datastore
-    ds.put(datasetEntity1);
-    ds.put(datasetEntity2);
-    ds.put(datasetEntity3);
-    ds.put(datasetEntity4);
-    ds.put(datasetEntity5);
-    ds.put(datasetEntity6);
-    ds.put(datasetEntity7);
-    ds.put(datasetEntity8);
-    ds.put(datasetEntity9);
-    ds.put(datasetEntity10);
 
-    Metadata metadata = new Metadata(USER, DATASET, MODEL, VISUALIZATION, NUMBER_OF_IMAGES, TIMESTAMP);
-    DatastoreMetadataStore datastoreStorage = new DatastoreMetadataStore();
+    Metadata metadata = Metadata.of(USER, DATASET, MODEL, VISUALIZATION, NUMBER_OF_IMAGES, TIMESTAMP);
     datastoreStorage.storeData(metadata);
     Metadata retrievedMetadata = datastoreStorage.retrieveMetadata("my_test_dataset");
 
-    Assert.assertEquals(USER, retrievedMetadata.getUser());
-    Assert.assertEquals(DATASET, retrievedMetadata.getDataset());
-    Assert.assertEquals(MODEL, retrievedMetadata.getModel());
-    Assert.assertEquals(VISUALIZATION, retrievedMetadata.getVisualization());
-    Assert.assertEquals(NUMBER_OF_IMAGES, retrievedMetadata.getNumberOfImages());
-    Assert.assertEquals(TIMESTAMP, retrievedMetadata.getTimestamp());
+    Assert.assertEquals(USER, retrievedMetadata.user());
+    Assert.assertEquals(DATASET, retrievedMetadata.dataset());
+    Assert.assertEquals(MODEL, retrievedMetadata.model());
+    Assert.assertEquals(VISUALIZATION, retrievedMetadata.visualization());
+    Assert.assertEquals(NUMBER_OF_IMAGES, retrievedMetadata.numberOfImages());
+    Assert.assertEquals(TIMESTAMP, retrievedMetadata.timestamp());
   }
   
   
@@ -135,22 +110,7 @@ public class DatastoreMetadataStoreTest {
   public void retrieveNonexistantMetadata() {
     // Test to show what happens when a dataset doesn't exist
 
-    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-    // Add some entities to Datastore
-    ds.put(datasetEntity1);
-    ds.put(datasetEntity2);
-    ds.put(datasetEntity3);
-    ds.put(datasetEntity4);
-    ds.put(datasetEntity5);
-    ds.put(datasetEntity6);
-    ds.put(datasetEntity7);
-    ds.put(datasetEntity8);
-    ds.put(datasetEntity9);
-    ds.put(datasetEntity10);
-
-    DatastoreMetadataStore datastoreStorage = new DatastoreMetadataStore();
     Metadata metadata = datastoreStorage.retrieveMetadata("non_existant_dataset");
-
     Assert.assertEquals(null, metadata);
   }
   
@@ -158,19 +118,6 @@ public class DatastoreMetadataStoreTest {
   @Test
   public void testRetrieveUsersDatasets() {
     // Test the proper retrieval of a user's datasets
-    
-    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-    // Add some entities to Datastore
-    ds.put(datasetEntity1);
-    ds.put(datasetEntity2);
-    ds.put(datasetEntity3);
-    ds.put(datasetEntity4);
-    ds.put(datasetEntity5);
-    ds.put(datasetEntity6);
-    ds.put(datasetEntity7);
-    ds.put(datasetEntity8);
-    ds.put(datasetEntity9);
-    ds.put(datasetEntity10);
 
     List<String> testDatasetList = new ArrayList<String>();
     testDatasetList.add("johnnys_first_dataset");
@@ -180,7 +127,6 @@ public class DatastoreMetadataStoreTest {
     testDatasetList.add("set_five");
     testDatasetList.add("test_dataset");
 
-    DatastoreMetadataStore datastoreStorage = new DatastoreMetadataStore();
     Assert.assertEquals(testDatasetList, datastoreStorage.getUsersDatasets("johndallard@google.com"));
   }
 
@@ -190,21 +136,7 @@ public class DatastoreMetadataStoreTest {
     // Test to show that nothing is returned when nonexistant user's
     // datasets are searched for in Datastore
 
-    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-    // Add some entities to Datastore
-    ds.put(datasetEntity1);
-    ds.put(datasetEntity2);
-    ds.put(datasetEntity3);
-    ds.put(datasetEntity4);
-    ds.put(datasetEntity5);
-    ds.put(datasetEntity6);
-    ds.put(datasetEntity7);
-    ds.put(datasetEntity8);
-    ds.put(datasetEntity9);
-    ds.put(datasetEntity10);
-
     List<String> emptyDatasetList = new ArrayList<String>();
-    DatastoreMetadataStore datastoreStorage = new DatastoreMetadataStore();
     Assert.assertEquals(emptyDatasetList, datastoreStorage.getUsersDatasets("myfake_email@gmail.com"));
   }
 
@@ -214,20 +146,6 @@ public class DatastoreMetadataStoreTest {
     // Test to show metadataExists() will return true when a 
     // user has a particular dataset name belonging to them in Datastore 
 
-    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-    // Add some entities to Datastore
-    ds.put(datasetEntity1);
-    ds.put(datasetEntity2);
-    ds.put(datasetEntity3);
-    ds.put(datasetEntity4);
-    ds.put(datasetEntity5);
-    ds.put(datasetEntity6);
-    ds.put(datasetEntity7);
-    ds.put(datasetEntity8);
-    ds.put(datasetEntity9);
-    ds.put(datasetEntity10);
-
-    DatastoreMetadataStore datastoreStorage = new DatastoreMetadataStore();
     Assert.assertEquals(true, datastoreStorage.metadataExists("test_dataset", "johndallard@google.com"));
   }
 
@@ -236,20 +154,6 @@ public class DatastoreMetadataStoreTest {
     // Test to show metadataExists() will return false when 
     // both the user and dataset name don't exist in Datastore
 
-    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-    // Add some entities to Datastore
-    ds.put(datasetEntity1);
-    ds.put(datasetEntity2);
-    ds.put(datasetEntity3);
-    ds.put(datasetEntity4);
-    ds.put(datasetEntity5);
-    ds.put(datasetEntity6);
-    ds.put(datasetEntity7);
-    ds.put(datasetEntity8);
-    ds.put(datasetEntity9);
-    ds.put(datasetEntity10);
-
-    DatastoreMetadataStore datastoreStorage = new DatastoreMetadataStore();
     Assert.assertEquals(false, datastoreStorage.metadataExists("truly_fake_dataset", "johndee731@gmail.com"));
   }
 
@@ -259,20 +163,6 @@ public class DatastoreMetadataStoreTest {
     // Test to show metadataExists() will return false when 
     // the user exists but they don't have this dataset
 
-    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-    // Add some entities to Datastore
-    ds.put(datasetEntity1);
-    ds.put(datasetEntity2);
-    ds.put(datasetEntity3);
-    ds.put(datasetEntity4);
-    ds.put(datasetEntity5);
-    ds.put(datasetEntity6);
-    ds.put(datasetEntity7);
-    ds.put(datasetEntity8);
-    ds.put(datasetEntity9);
-    ds.put(datasetEntity10);
-
-    DatastoreMetadataStore datastoreStorage = new DatastoreMetadataStore();
     Assert.assertEquals(false, datastoreStorage.metadataExists("not_my_set", "johndallard@google.com"));
   }
 
@@ -281,24 +171,12 @@ public class DatastoreMetadataStoreTest {
     // Test to show metadataExists() will return false when 
     // the user exists but the dataset belongs to another user
 
-    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-    // Add some entities to Datastore
-    ds.put(datasetEntity1);
-    ds.put(datasetEntity2);
-    ds.put(datasetEntity3);
-    ds.put(datasetEntity4);
-    ds.put(datasetEntity5);
-    ds.put(datasetEntity6);
-    ds.put(datasetEntity7);
-    ds.put(datasetEntity8);
-    ds.put(datasetEntity9);
-    ds.put(datasetEntity10);
-
-    DatastoreMetadataStore datastoreStorage = new DatastoreMetadataStore();
     Assert.assertEquals(false, datastoreStorage.metadataExists("gundams", "johndallard@google.com"));
   }
 
-  public void setUpEntities() {
+  public void setUpDatastore() {
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+
     datasetEntity1 = new Entity("MetaData");
     datasetEntity1.setProperty("user-email", "johndallard@google.com");
     datasetEntity1.setProperty("dataset-name", "johnnys_first_dataset");
@@ -379,5 +257,16 @@ public class DatastoreMetadataStoreTest {
     datasetEntity10.setProperty("image-count", 21);
     datasetEntity10.setProperty("timestamp", 1596642420849L);
     
+    // Place entities in emulated Datastore
+    ds.put(datasetEntity1);
+    ds.put(datasetEntity2);
+    ds.put(datasetEntity3);
+    ds.put(datasetEntity4);
+    ds.put(datasetEntity5);
+    ds.put(datasetEntity6);
+    ds.put(datasetEntity7);
+    ds.put(datasetEntity8);
+    ds.put(datasetEntity9);
+    ds.put(datasetEntity10);
   }
 }

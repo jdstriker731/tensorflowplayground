@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.sps.servlets.Metadata;
+import com.google.sps.servlets.MetadataStore;
 import com.google.sps.servlets.DatastoreMetadataStore;
 
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
@@ -40,6 +41,9 @@ public class DatasetNamesServlet extends HttpServlet {
 
   private static final Gson GSON = new Gson();
 
+  // Instance of DatastoreMetadatastore class 
+  private static final MetadataStore DATASTORE_STORAGE = new DatastoreMetadataStore();
+
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     // Get current user logged in to webapp
@@ -47,8 +51,7 @@ public class DatasetNamesServlet extends HttpServlet {
     String userEmail = userService.getCurrentUser().getEmail();
 
     // Get the logged in user's datasets
-    DatastoreMetadataStore datastoreStorage = new DatastoreMetadataStore();
-    List<String> userDatasets = datastoreStorage.getUsersDatasets(userEmail);
+    List<String> userDatasets = DATASTORE_STORAGE.getUsersDatasets(userEmail);
 
     // Convert userDatasets to exportable json format
     String json = GSON.toJson(userDatasets);

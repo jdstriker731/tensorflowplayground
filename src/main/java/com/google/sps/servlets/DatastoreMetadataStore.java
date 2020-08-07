@@ -25,9 +25,14 @@ import com.google.appengine.api.users.UserServiceFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A class for storing and accessing Metadata entities within
+ * Datastore.
+ * @implements {MetadataStore}
+ */
 public class DatastoreMetadataStore implements MetadataStore {
 
-  public DatastoreMetadataStore() { }
+  public DatastoreMetadataStore() {}
 
   /**
    * Stores a valid Metadata type into Datastore
@@ -38,12 +43,12 @@ public class DatastoreMetadataStore implements MetadataStore {
 
     // Create a new Entity
     Entity datasetEntity = new Entity("MetaData");
-    datasetEntity.setProperty("user-email", data.getUser());
-    datasetEntity.setProperty("dataset-name", data.getDataset());
-    datasetEntity.setProperty("model", data.getModel());
-    datasetEntity.setProperty("visualizer-type", data.getVisualization());
-    datasetEntity.setProperty("image-count", data.getNumberOfImages());
-    datasetEntity.setProperty("timestamp", data.getTimestamp());
+    datasetEntity.setProperty("user-email", data.user());
+    datasetEntity.setProperty("dataset-name", data.dataset());
+    datasetEntity.setProperty("model", data.model());
+    datasetEntity.setProperty("visualizer-type", data.visualization());
+    datasetEntity.setProperty("image-count", data.numberOfImages());
+    datasetEntity.setProperty("timestamp", data.timestamp());
 
     // Place entity withing Datastore
     datastore.put(datasetEntity);
@@ -65,7 +70,7 @@ public class DatastoreMetadataStore implements MetadataStore {
         String visualizerType = (String) entity.getProperty("visualizer-type");
         long imageCount = (Long) entity.getProperty("image-count");
         long time = (Long) entity.getProperty("timestamp");
-        return new Metadata(email, dataset, model, visualizerType, imageCount, time);
+        return new AutoValue_Metadata(email, dataset, model, visualizerType, imageCount, time);
       }
     }
     return null;

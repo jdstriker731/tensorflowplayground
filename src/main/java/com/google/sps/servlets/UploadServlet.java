@@ -40,6 +40,7 @@ import com.google.cloud.storage.StorageOptions;
 import java.nio.file.Paths;
 
 import com.google.sps.servlets.Metadata;
+import com.google.sps.servlets.MetadataStore;
 import com.google.sps.servlets.DatastoreMetadataStore;
 
 /** Servlet for uploading files. */
@@ -53,6 +54,9 @@ public class UploadServlet extends HttpServlet {
   // The ID of your GCS bucket
   private static final String BUCKET_NAME = "embedding-visualizer-bucket";
 
+  // Instance of DatastoreMetadatastore class 
+  private static final MetadataStore DATASTORE_STORAGE = new DatastoreMetadataStore();
+
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
     // Get current user logged in to webapp
@@ -63,9 +67,7 @@ public class UploadServlet extends HttpServlet {
     String datasetName = request.getParameter("dataset-namer");
     long timestamp = System.currentTimeMillis();
 
-    // Create new instance of DatastoreMetadatastore class 
-    DatastoreMetadataStore datastoreStorage = new DatastoreMetadataStore();
-    boolean datasetExists = datastoreStorage.metadataExists(datasetName, userEmail);
+    boolean datasetExists = DATASTORE_STORAGE.metadataExists(datasetName, userEmail);
 
     if (datasetExists) {
       response.sendRedirect("/already_exists.html");
@@ -107,10 +109,10 @@ public class UploadServlet extends HttpServlet {
     }
     
     // Create new Metadata Object
-    Metadata newMetadata = new Metadata(userEmail, datasetName, "DELG", "t-SNE", imageCount, timestamp);
+    Metadata newMetadata = Metadata.of(userEmail, datasetName, "DELG", "t-SNE", imageCount, timestamp);
 
     // Store newData within Datastore
-    datastoreStorage.storeData(newMetadata);
+    DATASTORE_STORAGE.storeData(newMetadata);
 
     /* Redirect user */
     response.sendRedirect("/index.html");
