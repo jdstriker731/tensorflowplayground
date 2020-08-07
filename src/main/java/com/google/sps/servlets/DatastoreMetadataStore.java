@@ -27,8 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A class for storing and accessing Metadata entities within
- * Datastore.
+ * A class for storing and accessing Metadata entities within Datastore.
  * @implements {MetadataStore}
  */
 public class DatastoreMetadataStore implements MetadataStore {

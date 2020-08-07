@@ -21,8 +21,26 @@ import java.util.List;
  * with some type of external database (ex: Datastore, Firestore, SQL)
  */
 public interface MetadataStore {
+
+  /**
+   * Stores a valid Metadata type into an external database.
+   */
   public void storeData(Metadata data);
+
+  /**
+   * Retrieves the metadata information for a particular dataset.
+   */
   public Metadata retrieveMetadata(String datasetName);
+
+  /**
+   * Retrieves all the names of datasets belonging to a 
+   * particular user.
+   */
   public List<String> getUsersDatasets(String user);
+
+  /**
+   * Checks to see if a particular user already has a dataset
+   * with a particular name.
+   */
   public boolean metadataExists(String datasetName, String user);
 }
