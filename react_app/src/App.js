@@ -6,8 +6,12 @@ import {ThreeRenderer} from './threeVisualizer.js'
 export default class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { datasets: [],
-                    selectedDataset:  '' };
+    
+    this.state = {
+        datasets: [],
+        selectedDataset:  ''
+      };
+
     this.fetchUserDatasets = this.fetchUserDatasets.bind(this);
     this.selectionCallback = this.selectionCallback.bind(this);
   }
