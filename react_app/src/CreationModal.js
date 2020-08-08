@@ -31,7 +31,7 @@ function CreationModal({ show, close, children }) {
     setHasName(false);
     setInfoAvailable(false);
     setUploadComplete(false);
-    document.getElementById("input-dialog").reset();
+    document.getElementById('input-dialog').reset();
 
     close();
   }
@@ -73,8 +73,8 @@ function CreationModal({ show, close, children }) {
           <div className="uploadInfo">
             <div className="dataset-info" disabled={!infoAvailable}>
               <p>Dataset Info:</p>
-              <p>Name: {datasetName.length ? datasetName : "N/A"}</p>
-              <p>Number of images: {files.length > 0 ? files.length : "N/A"}</p>
+              <p>Name: {datasetName.length ? datasetName : 'N/A'}</p>
+              <p>Number of images: {files.length > 0 ? files.length : 'N/A'}</p>
             </div>
             {!uploadComplete && (
               <button
