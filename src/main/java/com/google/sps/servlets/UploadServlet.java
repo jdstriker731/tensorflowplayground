@@ -98,7 +98,7 @@ public class UploadServlet extends HttpServlet {
       if (!"file-upload-dialog".equals(part.getName())) continue;
       InputStream inputStream = part.getInputStream();
 
-      String fileName = Paths.get(part.getSubmittedFileName()).getFileName().toString(); // MSIE fix.
+      String fileName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
       //The ID of your GCS object
       String objectName = userImagesDir + fileName;
 
@@ -109,7 +109,8 @@ public class UploadServlet extends HttpServlet {
     }
     
     // Create new Metadata Object
-    Metadata newMetadata = Metadata.of(userEmail, datasetName, "DELG", "t-SNE", imageCount, timestamp);
+    Metadata newMetadata = Metadata.of(userEmail, datasetName, 
+        "DELG", "t-SNE", imageCount, timestamp);
 
     // Store newData within Datastore
     DATASTORE_STORAGE.storeData(newMetadata);

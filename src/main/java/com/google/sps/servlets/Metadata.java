@@ -24,7 +24,8 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 public abstract class Metadata {
 
-  public static Metadata of(String user, String dataset, String model, String visualization, long numberOfImages, long timestamp) {
+  public static Metadata of(String user, String dataset, String model, 
+      String visualization, long numberOfImages, long timestamp) {
     return new AutoValue_Metadata(user, dataset, model, visualization, numberOfImages, timestamp);
   }
 

@@ -135,7 +135,8 @@ public class DatastoreMetadataStore implements MetadataStore {
   private static PreparedQuery getAllDatastoreEntitiesForUser(String user) {
     Filter propertyFilter = new FilterPredicate("user-email", FilterOperator.EQUAL, user);
 
-    Query query = new Query("MetaData").setFilter(propertyFilter).addSort("timestamp", SortDirection.ASCENDING);
+    Query query = new Query("MetaData").setFilter(propertyFilter)
+        .addSort("timestamp", SortDirection.ASCENDING);
     
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
