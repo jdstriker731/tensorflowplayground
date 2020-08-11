@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A class for storing and accessing Metadata entities within Datastore. 
+ * A class for storing and accessing Metadata entities within Datastore.
  * @implements {MetadataStore}
  */
 public class DatastoreMetadataStore implements MetadataStore {
@@ -55,7 +55,8 @@ public class DatastoreMetadataStore implements MetadataStore {
   }
   
   /**
-   * Retrieves the metadata information stored withing Datastore using a given dataset name.
+   * Retrieves the metadata information stored withing Datastore
+   * using a given dataset name.
    */
   public Metadata retrieveMetadata(String datasetName) {
     // Check to see if any entity has the same matching dataset name
@@ -83,7 +84,8 @@ public class DatastoreMetadataStore implements MetadataStore {
   }
 
   /**
-   * Retrieves all the names of datasets belonging to a particular user.
+   * Retrieves all the names of datasets belonging to a 
+   * particular user.
    */
   public List<String> getUsersDatasets(String user) {
     List<String> userDatasets = new ArrayList<String>();
@@ -96,7 +98,8 @@ public class DatastoreMetadataStore implements MetadataStore {
   }
 
   /**
-   * Checks to see if a particular user already has a dataset with a particular name.
+   * Checks to see if a particular user already has a dataset
+   * with a particular name.
    */
   public boolean metadataExists(String datasetName, String user) { 
     for (Entity entity : getAllDatastoreEntities().asIterable()) {
@@ -113,7 +116,8 @@ public class DatastoreMetadataStore implements MetadataStore {
   }
 
   /**
-   * Retrieves all of the entities from Datastore and returns them in a PreparedQuery.
+   * Retrieves all of the entities from Datastore and 
+   * returns them in a PreparedQuery.
    */
   private static PreparedQuery getAllDatastoreEntities() {
     Query query = new Query("MetaData").addSort("timestamp", SortDirection.ASCENDING);
@@ -125,8 +129,8 @@ public class DatastoreMetadataStore implements MetadataStore {
   }
   
   /**
-   * Retrieves all of the entities from Datastore for a particular user and returns them 
-   * in a PreparedQuery.
+   * Retrieves all of the entities from Datastore for a particular user and 
+   * returns them in a PreparedQuery.
    */
   private static PreparedQuery getAllDatastoreEntitiesForUser(String user) {
     Filter propertyFilter = new FilterPredicate("user-email", FilterOperator.EQUAL, user);

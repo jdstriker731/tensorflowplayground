@@ -59,7 +59,7 @@ public class DatastoreMetadataStoreTest {
   
   @Test
   public void basicMetadataRetrieval() {
-    // Test to show correct metadata retrieval for a particular dataset.
+    // Test to show correct metadata retrieval for a particular dataset
 
     Metadata metadata = 
         Metadata.of("johndallard@google.com", "my_test_dataset", "DELG", 
@@ -70,7 +70,7 @@ public class DatastoreMetadataStoreTest {
   
   @Test
   public void retrieveNonexistantMetadata() {
-    // Test to show what happens when a dataset doesn't exist.
+    // Test to show what happens when a dataset doesn't exist
 
     Metadata metadata = datastoreStorage.retrieveMetadata("non_existant_dataset");
     Assert.assertEquals(null, metadata);
@@ -78,7 +78,7 @@ public class DatastoreMetadataStoreTest {
   
   @Test
   public void testRetrieveUsersDatasets() {
-    // Test the proper retrieval of a user's datasets.
+    // Test the proper retrieval of a user's datasets
 
     List<String> testDatasetList = 
         ImmutableList.of("johnnys_first_dataset", "test_testerson", 
@@ -89,8 +89,8 @@ public class DatastoreMetadataStoreTest {
 
   @Test
   public void nonexistantUserDatasetsRetrieval() {
-    // Test to show that nothing is returned when nonexistant user's datasets are searched for in 
-    // Datastore.
+    // Test to show that nothing is returned when nonexistant user's
+    // datasets are searched for in Datastore
 
     List<String> emptyDatasetList = new ArrayList<String>();
     Assert.assertEquals(emptyDatasetList, 
@@ -99,16 +99,16 @@ public class DatastoreMetadataStoreTest {
 
   @Test
   public void datasetForUserExists() {
-    // Test to show metadataExists() will return true when a user has a particular dataset name 
-    // belonging to them in Datastore.
+    // Test to show metadataExists() will return true when a 
+    // user has a particular dataset name belonging to them in Datastore 
 
     Assert.assertTrue(datastoreStorage.metadataExists("test_dataset", "johndallard@google.com"));
   }
 
   @Test
   public void nonexistantDatasetAndUserCombo() {
-    // Test to show metadataExists() will return false when both the user and dataset name don't 
-    // exist in Datastore.
+    // Test to show metadataExists() will return false when 
+    // both the user and dataset name don't exist in Datastore
 
     Assert.assertFalse(
         datastoreStorage.metadataExists("truly_fake_dataset", "johndee731@gmail.com"));
@@ -116,16 +116,16 @@ public class DatastoreMetadataStoreTest {
   
   @Test
   public void userDoesNotHaveDataset() {
-    // Test to show metadataExists() will return false when the user exists but they don't have
-    // this dataset.
+    // Test to show metadataExists() will return false when 
+    // the user exists but they don't have this dataset
 
     Assert.assertFalse(datastoreStorage.metadataExists("not_my_set", "johndallard@google.com"));
   }
 
   @Test
   public void userDoesNotOwnDataset() {
-    // Test to show metadataExists() will return false when the user exists but the dataset belongs
-    // to another user.
+    // Test to show metadataExists() will return false when 
+    // the user exists but the dataset belongs to another user
 
     Assert.assertFalse(datastoreStorage.metadataExists("gundams", "johndallard@google.com"));
   }
