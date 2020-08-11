@@ -35,7 +35,6 @@ import com.google.sps.servlets.Metadata;
 import com.google.sps.servlets.MetadataStore;
 import com.google.sps.servlets.DatastoreMetadataStore;
 
-/** Servlet that returns some example content. TODO: modify this file to handle comments data */
 @WebServlet("/dataset-names")
 public class DatasetNamesServlet extends HttpServlet {
 

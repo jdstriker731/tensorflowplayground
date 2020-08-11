@@ -17,14 +17,14 @@ package com.google.sps.servlets;
 import com.google.auto.value.AutoValue;
 
 /**
- * A class that defines an entity that could be
- * placed withing some type of external storage
- * system (ex: Datastore, Firestore, SQL)
+ * A class that defines an entity that could be placed withing some type of external storage system
+ * (ex: Datastore, Firestore, SQL)
  */
 @AutoValue
 public abstract class Metadata {
 
-  public static Metadata of(String user, String dataset, String model, String visualization, long numberOfImages, long timestamp) {
+  public static Metadata of(String user, String dataset, String model, 
+      String visualization, long numberOfImages, long timestamp) {
     return new AutoValue_Metadata(user, dataset, model, visualization, numberOfImages, timestamp);
   }
 
