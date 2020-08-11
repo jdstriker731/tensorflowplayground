@@ -17,8 +17,8 @@ package com.google.sps.servlets;
 import java.util.List;
 
 /**
- * An interface that defines methods for interacting
- * with some type of external database (ex: Datastore, Firestore, SQL)
+ * An interface that defines methods for interacting with some type of external database 
+ * (ex: Datastore, Firestore, SQL)
  */
 public interface MetadataStore {
 
@@ -33,14 +33,12 @@ public interface MetadataStore {
   public Metadata retrieveMetadata(String datasetName);
 
   /**
-   * Retrieves all the names of datasets belonging to a 
-   * particular user.
+   * Retrieves all the names of datasets belonging to a particular user.
    */
   public List<String> getUsersDatasets(String user);
 
   /**
-   * Checks to see if a particular user already has a dataset
-   * with a particular name.
+   * Checks to see if a particular user already has a dataset with a particular name.
    */
   public boolean metadataExists(String datasetName, String user);
 }
