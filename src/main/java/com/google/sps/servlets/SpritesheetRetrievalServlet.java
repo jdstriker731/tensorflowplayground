@@ -35,14 +35,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
+import com.google.common.base.Joiner; 
 
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
-@WebServlet("/coordinates-retrieval")
-public class CoordinatesRetrievalServlet extends HttpServlet {
+@WebServlet("/spritesheet-retrieval")
+public class SpritesheetRetrievalServlet extends HttpServlet {
    
   // The ID of your GCS bucket
   private static final String BUCKET_NAME = "spritesheet_json";
-  private static final Logger log = Logger.getLogger(CoordinatesRetrievalServlet.class.getName());
+  private static final Logger log = Logger.getLogger(SpritesheetRetrievalServlet.class.getName());
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -54,20 +55,23 @@ public class CoordinatesRetrievalServlet extends HttpServlet {
     // Get the name of the dataset they want to visualize
     String datasetName = request.getParameter("dataset"); 
 
-    // Get the path to the spritesheet
-    String userDirectory = BUCKET_NAME + "/" + userEmail + "/";
-    String userDatasetDir = userDirectory + datasetName + "/";
-    String userJsonFilePath = userDatasetDir + "coordinates.json";
+    String[] spritesheetFilePaths = {BUCKET_NAME, userEmail, datasetName, "spritesheets", "spritesheet.png"}; 
+    String userSpritesheetFilePath = joinFilePaths(spritesheetFilePaths);
 
-    log.info("OH HAI THAR! Downloading: " + userJsonFilePath);
+    log.info("OH HAI THAR! Downloading: " + userSpritesheetFilePath);
 
     try {
       BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
-      BlobKey blobKey = blobstoreService.createGsBlobKey("/gs/" + userJsonFilePath);
+      BlobKey blobKey = blobstoreService.createGsBlobKey("/gs/" + userSpritesheetFilePath);
       blobstoreService.serve(blobKey, response);
-      log.info("KTHNXBAI" + userJsonFilePath);
+      log.info("KTHNXBAI" + userSpritesheetFilePath);
     } catch(IOException e) {
       log.info(e.toString());
     }
+  }
+
+  /** Creates the path leading to the spritesheet.png file needed for their visualization */
+  public static String joinFilePaths(String[] paths) {
+    return Joiner.on(File.separator).join(paths);
   }
 }

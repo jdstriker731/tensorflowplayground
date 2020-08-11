@@ -35,13 +35,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
+import com.google.common.base.Joiner; 
 
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
 @WebServlet("/coordinates-retrieval")
 public class CoordinatesRetrievalServlet extends HttpServlet {
    
   // The ID of your GCS bucket
-  private static final String BUCKET_NAME = "spritesheet_json";
+  private static final String BUCKET_NAME = "coordinates_json_bucket";
   private static final Logger log = Logger.getLogger(CoordinatesRetrievalServlet.class.getName());
 
   @Override
@@ -54,10 +55,8 @@ public class CoordinatesRetrievalServlet extends HttpServlet {
     // Get the name of the dataset they want to visualize
     String datasetName = request.getParameter("dataset"); 
 
-    // Get the path to the spritesheet
-    String userDirectory = BUCKET_NAME + "/" + userEmail + "/";
-    String userDatasetDir = userDirectory + datasetName + "/";
-    String userJsonFilePath = userDatasetDir + "coordinates.json";
+    String[] coordinatesFilePath = {BUCKET_NAME, userEmail, datasetName, "coordinates.json"}; 
+    String userJsonFilePath = joinFilePaths(coordinatesFilePath);
 
     log.info("OH HAI THAR! Downloading: " + userJsonFilePath);
 
@@ -69,5 +68,10 @@ public class CoordinatesRetrievalServlet extends HttpServlet {
     } catch(IOException e) {
       log.info(e.toString());
     }
+  }
+
+  /** Creates the path leading to the coordinates.json file needed for their visualization */
+  public static String joinFilePaths(String[] paths) {
+    return Joiner.on(File.separator).join(paths);
   }
 }
