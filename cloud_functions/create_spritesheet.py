@@ -20,14 +20,10 @@ all thumbnails into a numpy array
 
 import os
 import tempfile
-import base64
+import file_path_utils as fp
 from google.cloud import storage, vision, datastore
-import json
-import re
-import sys
 import numpy as np
 import cv2
-import json
 
 # Initiating the storage & datastore clients.
 storage_client = storage.Client()
@@ -36,6 +32,7 @@ vision_client = vision.ImageAnnotatorClient()
 BUCKET_NAME = 'embeddings_visualizer_output_bucket'
 SPRITESHEET_FOLDER_NAME = 'spritesheets'
 SPRITESHEET = 'spritesheet'
+
 
 def create_spritesheet(file_data, context):
     """Creates a spritesheet.
@@ -55,8 +52,8 @@ def create_spritesheet(file_data, context):
     file_name = file_data['name']
     user_name, dataset_name = get_user_and_dataset_name(file_name)
 
-    spritesheet_file_name = (os.path.join(user_name, dataset_name,
-                                        spritesheet_folder_name, SPRITESHEET))
+    spritesheet_file_name = (os.path.join(
+        user_name, dataset_name, SPRITESHEET_FOLDER_NAME, SPRITESHEET))
 
     # We check to make sure the image is does not have the same name as the spr
     # itesheet, so that when we upload the spritesheet the function doesn't run
@@ -88,8 +85,7 @@ def create_spritesheet(file_data, context):
     for thumbnail_file_name in thumbnail_file_names:
         thumbnail = load_image(BUCKET_NAME, thumbnail_file_name)
         spritesheet = thumbnail if spritesheet is None else np.concatenate(
-            (spritesheet,
-            thumbnail), axis=1)
+            (spritesheet, thumbnail), axis=1)
 
     save_image(BUCKET_NAME, spritesheet_file_name, spritesheet)
 
@@ -181,19 +177,7 @@ def get_user_and_dataset_name(file_name):
     Returns:
         The name of the user and dataset name.
     """
-    parts = file_name.split('/')
-    user = parts[0]
-    dataset_name = parts[1]
-
-    # If the area after the second slash (where the datastore name should b
-    # e) is empty, then look through the rest of the string until there is 
-    # a name a vailable if not then just return the user. The while loop en
-    # ds when there is a string that is not empty, meaning there is a name 
-    # there.
-    i = 1
-    while not parts[i] and i < len(parts) - 1:
-        i = i + 1
-    return user, parts[i] if len(parts[i]) > 0 else 'No dataset found'
+    return fp.get_user_and_dataset_name(file_name)
 
 
 def get_metadata(user, dataset_name):
@@ -228,10 +212,4 @@ def get_photo_name(file_name):
     Returns:
         The name of the photo.
     """
-    parts = file_name.split('/')
-
-    # If there is no name after the last slash, take the name before the last s
-    # lash 
-    if not parts[-1]:
-        return parts[-2]
-    return parts[-1]
+    return fp.get_photo_name()

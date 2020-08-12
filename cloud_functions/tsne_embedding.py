@@ -18,6 +18,7 @@ s have been uploaded, then gets the coordinates.
 """
 import numpy as np
 import os
+import file_path_utils as fp
 from sklearn.manifold import TSNE
 from google.cloud import storage, datastore
 import json
@@ -27,6 +28,7 @@ import tempfile
 storage_client = storage.Client()
 datastore_client = datastore.Client('step-2020-johndallard')
 OUTPUT_BUCKET_NAME = 'spritesheet_json'
+
 
 def run_tsne(trigger_file, _):
     """
@@ -93,13 +95,12 @@ def load_embedding(bucket_name, file_name):
     """
     tmp_file_name = os.path.join('/tmp', file_name.split('/')[-1])
     _, tmp_file_name = tempfile.mkstemp()
-
+    # Loads an image from bucket.
     storage_client.bucket(bucket_name).get_blob(
         file_name).download_to_filename(tmp_file_name)
     embedding = np.load(tmp_file_name)
 
     os.remove(tmp_file_name)
-
     return embedding
 
 
@@ -113,19 +114,8 @@ def get_user_and_dataset_name(file_name):
     Returns:
         The name of the user and dataset name.
     """
-    parts = file_name.split('/')
-    user = parts[0]
-    dataset_name = parts[1]
+    return fp.get_user_and_dataset_name(file_name)
 
-    # If the area after the second slash (where the datastore name should b
-    # e) is empty, then look through the rest of the string until there is 
-    # a name a vailable if not then just return the user. The while loop en
-    # ds when there is a string that is not empty, meaning there is a name 
-    # there.
-    i = 1
-    while not parts[i] and i < len(parts) - 1:
-        i = i + 1
-    return user, parts[i] if len(parts[i]) > 0 else 'No dataset found'
 
 def list_blobs_with_prefix(bucket_name, prefix, delimiter=None):
     """Lists all the blobs in the bucket that begin with the prefix.
@@ -144,6 +134,7 @@ def list_blobs_with_prefix(bucket_name, prefix, delimiter=None):
     blobs = storage_client.list_blobs(
         bucket_name, prefix=prefix, delimiter=delimiter)
     return [blob.name for blob in blobs if '.' in blob.name]
+
 
 def get_metadata(user, dataset_name):
     """Gets the metadata of the specific upload.
@@ -164,6 +155,7 @@ def get_metadata(user, dataset_name):
     result = list(query.fetch())
     return result[0] if len(result) >= 1 else None
 
+
 def get_expected_num_embeddings(metadata):
     """Gets the expected mumber of embeddings from datastore.
     Checks metadata for the correct number of photos uploaded from the data
@@ -177,6 +169,7 @@ def get_expected_num_embeddings(metadata):
     dataset_name, images_count_tuple, model, timestamp, user, viz_type = (
         sorted(metadata.items()))
     return images_count_tuple[1]
+
 
 def tsne_embed(embedding_container):
     """

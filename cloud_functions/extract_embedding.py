@@ -18,6 +18,7 @@ oad and run the saved model on the image.
 """
 import os
 import tempfile
+import file_path_utils as fp
 from google.cloud import storage
 import cv2
 import numpy as np
@@ -59,7 +60,6 @@ model = tf.saved_model.load('/tmp/saved_model/')
 embedding_fn = model.signatures[REQUIRED_SIGNATURE]
 
 
-
 # Entry point: triggered when file is added to the input bucket
 def extract_and_save_embedding(file_data, context):
     """Extracts and saves embeddings.
@@ -74,6 +74,7 @@ def extract_and_save_embedding(file_data, context):
     image = load_image(file_data['bucket'], file_data['name'])
     embedding = get_embedding(image)
     save_embedding(file_data['name'], embedding)
+
 
 def load_image(bucket_name, image_file_name):
     """Loads the actual image itself.
@@ -108,15 +109,17 @@ def load_image(bucket_name, image_file_name):
     os.remove(tmp_image_filename)
     return image
 
+
 def get_embedding(image):
     """Gets an embedding on the current image.
     Runs the DELG model on the current image.
     Args:
         image:
             CV2 image to be ran through model.
-    """    
+    """
     image_tensor = tf.convert_to_tensor(image)
     return embedding_fn(image_tensor)[REQUIRED_OUTPUT].numpy()
+
 
 def save_embedding(image_name, embedding):
     """Saves the image and stores it to the output bucket.
@@ -133,8 +136,8 @@ def save_embedding(image_name, embedding):
     np.save(tmp_name, embedding)
 
     # Embedding gets saved to directory in storage
-    user_name, dataset_name = get_user_and_dataset_name(file_name)
-    photo_name = get_photo_name(file_name)
+    user_name, dataset_name = get_user_and_dataset_name(image_name)
+    photo_name = get_photo_name(image_name)
     embeddings_file_name = os.path.join(
         user_name, dataset_name, EMBEDDINGS_FOLDER_NAME, photo_name + '.npy')
     bucket = storage_client.bucket(EMBEDDING_BUCKET_NAME)
@@ -145,44 +148,27 @@ def save_embedding(image_name, embedding):
 
 def get_user_and_dataset_name(file_name):
     """Gets the name of the user and the dataset uploaded.
-    Returns the user and dataset name in a tuple by splitting the uploa
-    d file path.
+    Returns the user and dataset name in a tuple by splitting the upload file p
+    ath.
     Args:
         file_name:
             Dictionary that contains data specific to the upload.
     Returns:
         The name of the user and dataset name.
     """
-    parts = file_name.split('/')
-    user = parts[0]
-    dataset_name = parts[1]
-
-    # If the area after the second slash (where the datastore name should be) i
-    # s empty, then look through the rest of the string until there is a name a
-    # vailable if not then just return the user. The while loop ends when there
-    # is a string that is not empty, meaning there is a name there
-    i = 1
-    while not parts[i] and i < len(parts) - 1:
-        i = i + 1
-    return user, parts[i] if len(parts[i]) > 0 else 'No dataset found'
+    return fp.get_user_and_dataset_name(file_name)
 
 
-def get_photo_name(self, file_name):
+def get_photo_name(file_name):
     """Gets the name of the photo uploaded, without filepath.
     Splits slases in file_name string and returns the last
     element, which is the name of the image and it's
-    extension. If there is no photo found after the last /, then return
-    the string before.
+    extension. If there is no photo found after the last /, then return the str
+    ing before
     Args:
         file_name:
             Dictionary that contains data specific to the upload.
     Returns:
         The name of the photo.
     """
-    parts = file_name.split('/')
-
-    # If there is no name after the last slash, take the name before the last s
-    # lash 
-    if not parts[-1]:
-        return parts[-2]
-    return parts[-1]
+    return fp.get_photo_name()

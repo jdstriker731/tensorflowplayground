@@ -20,14 +20,9 @@ bucket.
 """
 import os
 import tempfile
-import base64
+import file_path_utils as fp
 from google.cloud import storage, vision, datastore
 from wand.image import Image
-import cv2
-import json
-import re
-import sys
-import numpy as np
 
 storage_client = storage.Client()
 datastore_client = datastore.Client()
@@ -36,6 +31,7 @@ vision_client = vision.ImageAnnotatorClient()
 THUMBNAIL_SIZE = 64
 THUMBNAIL_BUCKET_NAME = 'embeddings_visualizer_output_bucket'
 THUMBNAIL_FOLDER_NAME = 'thumbnails'
+
 
 def process_image_input(file_data, context):
     """Creates thumbnail from given image.
@@ -54,9 +50,8 @@ def process_image_input(file_data, context):
     bucket_name = file_data['bucket']
     user_name, dataset_name = get_user_and_dataset_name(file_name)
     photo_name = get_photo_name(file_name)
-    thumbnail_file_name = os.path.join(user_name, dataset_name,
-                                    THUMBNAIL_FOLDER_NAME, photo_name)
-
+    thumbnail_file_name = os.path.join(
+        user_name, dataset_name,THUMBNAIL_FOLDER_NAME, photo_name)
 
     # Using the tempfile library this function downloads images from
     # the upload.
@@ -71,12 +66,10 @@ def process_image_input(file_data, context):
         image.thumbnail(THUMBNAIL_SIZE, THUMBNAIL_SIZE)
         image.save(filename=tmp_local_filename)
 
-
     # Uses the filepath made earlier with os.path.join to save the
     # thumbnail to the correct directory in the output bucket.
     thumbnail_blob = storage_client.bucket(THUMBNAIL_BUCKET_NAME).blob(
         thumbnail_file_name)
-
 
     # Uploads blob with current thumbnail to the correct directory
     # in the output bucket.
@@ -95,19 +88,7 @@ def get_user_and_dataset_name(file_name):
     Returns:
         The name of the user and dataset name.
     """
-    parts = file_name.split('/')
-    user = parts[0]
-    dataset_name = parts[1]
-
-    # If the area after the second slash (where the datastore name should b
-    # e) is empty, then look through the rest of the string until there is 
-    # a name a vailable if not then just return the user. The while loop en
-    # ds when there is a string that is not empty, meaning there is a name 
-    # there.
-    i = 1
-    while not parts[i] and i < len(parts) - 1:
-        i = i + 1
-    return user, parts[i] if len(parts[i]) > 0 else 'No dataset found'
+    return fp.get_user_and_dataset_name(file_name)
 
 
 def get_photo_name(file_name):
@@ -122,10 +103,4 @@ def get_photo_name(file_name):
     Returns:
         The name of the photo.
     """
-    parts = file_name.split('/')
-
-    # If there is no name after the last slash, take the name before the last s
-    # lash 
-    if not parts[-1]:
-        return parts[-2]
-    return parts[-1]
+    return fp.get_photo_name()
