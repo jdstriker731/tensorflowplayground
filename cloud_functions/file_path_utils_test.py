@@ -1,4 +1,3 @@
-# Logic tests
 # Copyright 2019 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import file_path_utils as fp
+from file_path_utils import get_user_and_dataset_name, get_photo_name
 
 NAME = 'bosticc@google.com/coolest_man_alive/original_images/myles_hun.jpg'
 PHOTO_NAME = 'myles.jpg'
@@ -26,7 +25,8 @@ CORRECT_TUP = ('bosticc@google.com', 'coolest_man_alive')
 def test_get_user_and_dataset_name_slashes_at_end():
     multiple_slashes_at_end = 'bosticc@google.com///'
     correct_tuple = ('bosticc@google.com', 'No dataset found')
-    assert fp.get_user_and_dataset_name(multiple_slashes_at_end) == correct_tuple
+    assert get_user_and_dataset_name(multiple_slashes_at_end) == (
+        correct_tuple)
 
 
 # This functions tests for multiple slashes between the dataset name and user n
@@ -34,7 +34,7 @@ def test_get_user_and_dataset_name_slashes_at_end():
 def test_get_user_and_dataset_name_too_many_slashes():
     extra_slash = 'aj@google.com//coolest_man_alive/original_images/my.jpg'
     correct_tuple = ('aj@google.com', 'coolest_man_alive')
-    assert fp.get_user_and_dataset_name(extra_slash) == (correct_tuple)
+    assert get_user_and_dataset_name(extra_slash) == (correct_tuple)
 
 
 # This function tests to make sure the function works properly with a normal in
@@ -42,19 +42,18 @@ def test_get_user_and_dataset_name_too_many_slashes():
 def test_user_name_normal_input():
     blank_name = 'bosticc@google.com/coolest_man_alive/original_images/myles.jpg'
     correct_tuple = ('bosticc@google.com', 'coolest_man_alive')
-    assert fp.get_user_and_dataset_name(blank_name) == correct_tuple
+    assert get_user_and_dataset_name(blank_name) == correct_tuple
 
 
 # This function tests to make sure if a slash is at the end of the file then re
 # turn the last name in the file as the photo name
 def test_photo_name_blank_photo_name():
     blank_name = 'bosticc/coolest_man_alive/original_images/myles.jpg/'
-    assert fp.get_photo_name(blank_name) == PHOTO_NAME
+    assert get_photo_name(blank_name) == PHOTO_NAME
 
 
 # This function tests to make sure the function works properly with a normal in
 # put.
 def test_photo_name_normal_input():
     blank_name = 'bosticc/coolest_man_alive/original_images/myles.jpg'
-    assert fp.get_photo_name(blank_name) == PHOTO_NAME
-
+    assert get_photo_name(blank_name) == PHOTO_NAME

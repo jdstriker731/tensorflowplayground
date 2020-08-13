@@ -18,7 +18,7 @@ s have been uploaded, then gets the coordinates.
 """
 import numpy as np
 import os
-import file_path_utils as fp
+from file_path_utils import get_user_and_dataset_name
 from sklearn.manifold import TSNE
 from google.cloud import storage, datastore
 import json
@@ -82,6 +82,7 @@ def run_tsne(trigger_file, _):
         tmp_json_filename)
     os.remove(tmp_json_filename)
 
+
 def load_embedding(bucket_name, file_name):
     """Loads an image.
     Retrieves image from bucket and returns in in a cv2 format.
@@ -102,19 +103,6 @@ def load_embedding(bucket_name, file_name):
 
     os.remove(tmp_file_name)
     return embedding
-
-
-def get_user_and_dataset_name(file_name):
-    """Gets the name of the user and the dataset uploaded.
-    Returns the user and dataset name in a tuple by splitting the upload file p
-    ath.
-    Args:
-        file_name:
-            Dictionary that contains data specific to the upload.
-    Returns:
-        The name of the user and dataset name.
-    """
-    return fp.get_user_and_dataset_name(file_name)
 
 
 def list_blobs_with_prefix(bucket_name, prefix, delimiter=None):

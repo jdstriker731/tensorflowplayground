@@ -20,7 +20,7 @@ bucket.
 """
 import os
 import tempfile
-import file_path_utils as fp
+from file_path_utils import get_user_and_dataset_name, get_photo_name
 from google.cloud import storage, vision, datastore
 from wand.image import Image
 
@@ -51,7 +51,7 @@ def process_image_input(file_data, context):
     user_name, dataset_name = get_user_and_dataset_name(file_name)
     photo_name = get_photo_name(file_name)
     thumbnail_file_name = os.path.join(
-        user_name, dataset_name,THUMBNAIL_FOLDER_NAME, photo_name)
+        user_name, dataset_name, THUMBNAIL_FOLDER_NAME, photo_name)
 
     # Using the tempfile library this function downloads images from
     # the upload.
@@ -76,31 +76,3 @@ def process_image_input(file_data, context):
     thumbnail_blob.upload_from_filename(tmp_local_filename)
 
     os.remove(tmp_local_filename)
-
-
-def get_user_and_dataset_name(file_name):
-    """Gets the name of the user and the dataset uploaded.
-    Returns the user and dataset name in a tuple by splitting the upload file p
-    ath.
-    Args:
-        file_name:
-            Dictionary that contains data specific to the upload.
-    Returns:
-        The name of the user and dataset name.
-    """
-    return fp.get_user_and_dataset_name(file_name)
-
-
-def get_photo_name(file_name):
-    """Gets the name of the photo uploaded, without filepath.
-    Splits slases in file_name string and returns the last
-    element, which is the name of the image and it's
-    extension. If there is no photo found after the last /, then return the str
-    ing before
-    Args:
-        file_name:
-            Dictionary that contains data specific to the upload.
-    Returns:
-        The name of the photo.
-    """
-    return fp.get_photo_name()

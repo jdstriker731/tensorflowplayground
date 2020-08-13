@@ -20,6 +20,7 @@ import os
 import tempfile
 import file_path_utils as fp
 from google.cloud import storage
+from file_path_utils import get_user_and_dataset_name, get_photo_name
 import cv2
 import numpy as np
 import tensorflow as tf
@@ -144,31 +145,3 @@ def save_embedding(image_name, embedding):
     blob = bucket.blob(embeddings_file_name)
     blob.upload_from_filename(tmp_name)
     os.remove(tmp_name)
-
-
-def get_user_and_dataset_name(file_name):
-    """Gets the name of the user and the dataset uploaded.
-    Returns the user and dataset name in a tuple by splitting the upload file p
-    ath.
-    Args:
-        file_name:
-            Dictionary that contains data specific to the upload.
-    Returns:
-        The name of the user and dataset name.
-    """
-    return fp.get_user_and_dataset_name(file_name)
-
-
-def get_photo_name(file_name):
-    """Gets the name of the photo uploaded, without filepath.
-    Splits slases in file_name string and returns the last
-    element, which is the name of the image and it's
-    extension. If there is no photo found after the last /, then return the str
-    ing before
-    Args:
-        file_name:
-            Dictionary that contains data specific to the upload.
-    Returns:
-        The name of the photo.
-    """
-    return fp.get_photo_name()

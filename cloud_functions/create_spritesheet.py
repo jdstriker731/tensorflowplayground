@@ -20,7 +20,7 @@ all thumbnails into a numpy array
 
 import os
 import tempfile
-import file_path_utils as fp
+from file_path_utils import get_user_and_dataset_name
 from google.cloud import storage, vision, datastore
 import numpy as np
 import cv2
@@ -167,19 +167,6 @@ def list_blobs_with_prefix(bucket_name, prefix, delimiter=None):
     return [blob.name for blob in blobs if '.' in blob.name]
 
 
-def get_user_and_dataset_name(file_name):
-    """Gets the name of the user and the dataset uploaded.
-    Returns the user and dataset name in a tuple by splitting the upload file p
-    ath.
-    Args:
-        file_name:
-            Dictionary that contains data specific to the upload.
-    Returns:
-        The name of the user and dataset name.
-    """
-    return fp.get_user_and_dataset_name(file_name)
-
-
 def get_metadata(user, dataset_name):
     """Gets the metadata of the specific upload.
     Checks datastore for an the latest entity that matches the name of the user
@@ -198,18 +185,3 @@ def get_metadata(user, dataset_name):
     query.add_filter('dataset-name', '=', dataset_name)
     result = list(query.fetch())
     return result[0] if len(result) >= 1 else None
-
-
-def get_photo_name(file_name):
-    """Gets the name of the photo uploaded, without filepath.
-    Splits slases in file_name string and returns the last
-    element, which is the name of the image and it's
-    extension. If there is no photo found after the last /, then return the str
-    ing before
-    Args:
-        file_name:
-            Dictionary that contains data specific to the upload.
-    Returns:
-        The name of the photo.
-    """
-    return fp.get_photo_name()
