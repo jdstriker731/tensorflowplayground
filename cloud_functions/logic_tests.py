@@ -1,3 +1,4 @@
+# Logic tests
 # Copyright 2019 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,15 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from unittest import mock
 from google.cloud import storage, datastore
-import create_spritesheet
 import os
 import tempfile
 import numpy as np
+import create_spritesheet as cs
+import create_thumbnail as ct
+import tsne_embedding as ts
+import extract_embedding as ee
 
 NAME = 'bosticc@google.com/coolest_man_alive/original_images/myles_hun.jpg'
+PHOTO_NAME = 'myles.jpg'
 PREFIX = 'bosticc@google.com/coolest_man_alive/original_images/'
+CORRECT_TUP = ('bosticc@google.com', 'coolest_man_alive')
 
 storage_client = storage.Client()
 datastore_client = datastore.Client('step-2020-johndallard')
@@ -29,39 +34,47 @@ datastore_client = datastore.Client('step-2020-johndallard')
 # This functions tests for a blank dataset name of the file, and if there is no
 # dataset name none should be returned from the function
 def test_get_user_and_dataset_name_slashes_at_end():
-    # logic_tests.get_user_and_dataset_name
     multiple_slashes_at_end = 'bosticc@google.com///'
     correct_tuple = ('bosticc@google.com', 'No dataset found')
-    assert create_spritesheet.get_user_and_dataset_name(
-        multiple_slashes_at_end) == (correct_tuple)
+    assert cs.get_user_and_dataset_name(multiple_slashes_at_end) == correct_tuple
+    assert ct.get_user_and_dataset_name(multiple_slashes_at_end) == correct_tuple
+    assert ts.get_user_and_dataset_name(multiple_slashes_at_end) == correct_tuple
+    assert ee.get_user_and_dataset_name(multiple_slashes_at_end) == correct_tuple
 
 
 # This functions tests for multiple slashes between the dataset name and user n
 # ame.
 def test_get_user_and_dataset_name_too_many_slashes():
-    slash_name_1 = 'bosticc@google.com//coolest_man_alive/original_images/my.jpg'
+    extra_slash = 'aj@google.com//coolest_man_alive/original_images/my.jpg'
+    correct_tuple = ('aj@google.com', 'coolest_man_alive')
+    assert cs.get_user_and_dataset_name(extra_slash) == (correct_tuple)
+    assert ct.get_user_and_dataset_name(extra_slash) == (correct_tuple)
+    assert ts.get_user_and_dataset_name(extra_slash) == (correct_tuple)
+    assert ee.get_user_and_dataset_name(extra_slash) == (correct_tuple)
+
+# This function tests to make sure the function works properly with a normal in
+# put.
+def test_user_name_normal_input():
+    blank_name = 'bosticc@google.com/coolest_man_alive/original_images/myles.jpg'
     correct_tuple = ('bosticc@google.com', 'coolest_man_alive')
-    assert create_spritesheet.get_user_and_dataset_name(slash_name_1) == (
-        correct_tuple)
+    assert cs.get_user_and_dataset_name(blank_name) == correct_tuple
+    assert ct.get_user_and_dataset_name(blank_name) == correct_tuple
+    assert ts.get_user_and_dataset_name(blank_name) == (correct_tuple)
+    assert ee.get_user_and_dataset_name(extra_slash) == (correct_tuple)
+
 
 
 # This function tests to make sure if a slash is at the end of the file then re
 # turn the last name in the file as the photo name
 def test_photo_name_blank_photo_name():
     blank_name = 'bosticc/coolest_man_alive/original_images/myles.jpg/'
-    assert create_spritesheet.get_photo_name(blank_name) == 'myles.jpg'
+    assert cs.get_photo_name(blank_name) == PHOTO_NAME
+    assert ct.get_photo_name(blank_name) == PHOTO_NAME
+
 
 # This function tests to make sure the function works properly with a normal in
 # put.
 def test_photo_name_normal_input():
     blank_name = 'bosticc/coolest_man_alive/original_images/myles.jpg'
-    assert create_spritesheet.get_photo_name(blank_name) == 'myles.jpg'
-
-
-# This functions tests for multiple slashes between the dataset name and user n
-# ame.
-def test_get_user_and_dataset_name_normal_input():
-    slash_name_1 = 'bosticc@google.com/coolest_man_alive/original_images/my.jpg'
-    correct_tuple = ('bosticc@google.com', 'coolest_man_alive')
-    assert create_spritesheet.get_user_and_dataset_name(slash_name_1) == (
-        correct_tuple)
+    assert cs.get_photo_name(blank_name) == PHOTO_NAME
+    assert ct.get_photo_name(blank_name) == PHOTO_NAME
