@@ -71,7 +71,7 @@ def create_spritesheet(file_data, context):
     num_expected_thumbnails = get_expected_thumbnail_number(metadata)
 
     # Check the amount of images already in the bucket from the dataset
-    folder = os.path.join('/', file_name.split('/')[:-1])
+    folder = os.path.dirname(file_name)
     thumbnail_file_names = sorted(list_blobs_with_prefix(BUCKET_NAME, folder))
     num_actual_thumbnails = len(thumbnail_file_names)
 
