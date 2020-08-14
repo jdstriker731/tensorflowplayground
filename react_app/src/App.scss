@@ -1,0 +1,75 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+
+html {
+    box-sizing: border-box;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+body {
+  outline : none;
+  margin: 20px 0;
+  padding: 0;
+  line-height: 1;
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+  color: #202020;
+  background-color: #fbfbfb;
+  font-smooth: always;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+  max-width: 1140px;
+  width: 100%;
+  margin: auto;
+}
+
+@mixin styling() {
+  background-color: white;
+  border-color: #ccc;
+  border-radius: 4px;
+  border-style: solid;
+  border-width: 1px;
+  box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+}
+
+.form-wrapper {
+  display: block;
+  margin-right: 20%;
+  margin-left: 20%;
+  margin-top: 3%;
+}
+
+.embedding-form {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+
+  .form-category {
+    display: flex;
+    justify-content: space-evenly;
+
+    .category-title {
+      margin-right: 10px;
+    }
+  }
+}
+
+.display-block {
+  display: block;
+}
+
+.display-none {
+  display: none;
+}
+
+.display-flex {
+  display: flex;
+}
