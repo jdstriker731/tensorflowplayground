@@ -30,7 +30,7 @@ vision_client = vision.ImageAnnotatorClient()
 
 THUMBNAIL_SIZE = 64
 THUMBNAIL_BUCKET_NAME = 'embeddings_visualizer_output_bucket'
-THUMBNAIL_FOLDER_NAME = 'thumbnails'
+THUMBNAIL_FOLDER_NAME = 'thumbnails
 
 
 def process_image_input(file_data, context):
