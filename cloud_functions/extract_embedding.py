@@ -16,6 +16,8 @@ This cloud function first saves all necessary components of the DELG model to t
 mp directories from GCP storage buckets and after doing so uses tensorflow to l
 oad and run the saved model on the image.
 """
+
+
 import os
 import tempfile
 import file_path_utils as fp
