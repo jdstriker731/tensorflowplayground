@@ -35,17 +35,16 @@ THUMBNAIL_FOLDER_NAME = 'thumbnails'
 
 def process_image_input(file_data, context):
     """Creates thumbnail from given image.
-    Retrieves given upload from trigger and uses wand.image
-    to create a 64x64 pixel image and uploads it to
-    THUMBNAIL_BUCKET_NAME.
+    Retrieves given upload from trigger and uses wand.image to create a 64x64 p
+    ixel image and uploads it to THUMBNAIL_BUCKET_NAME.
     Args:
         file_data:
             Dictionary that contains data specific to the event.
         context:
             Cloud functions event metadata.
     """
-    # Retrieves all the neccessary components of the
-    # file path this blob will have in the output bucket.
+    # Retrieves all the neccessary components of the file path this blob will h
+    # ave in the output bucket.
     file_name = file_data['name']
     bucket_name = file_data['bucket']
     user_name, dataset_name = get_user_and_dataset_name(file_name)
@@ -53,26 +52,26 @@ def process_image_input(file_data, context):
     thumbnail_file_name = os.path.join(
         user_name, dataset_name, THUMBNAIL_FOLDER_NAME, photo_name)
 
-    # Using the tempfile library this function downloads images from
-    # the upload.
+    # Using the tempfile library this function downloads images from the upload
+    # .
     full_size_image_blob = storage_client.bucket(bucket_name).get_blob(
         file_name)
     _, tmp_local_filename = tempfile.mkstemp()
     full_size_image_blob.download_to_filename(tmp_local_filename)
 
-    # Uses the Image library to create a thumbnail and saves it
-    # to the temp file
+    # Uses the Image library to create a thumbnail and saves it to the temp fil
+    # e.
     with Image(filename=tmp_local_filename) as image:
         image.thumbnail(THUMBNAIL_SIZE, THUMBNAIL_SIZE)
         image.save(filename=tmp_local_filename)
 
-    # Uses the filepath made earlier with os.path.join to save the
-    # thumbnail to the correct directory in the output bucket.
+    # Uses the filepath made earlier with os.path.join to save the thumbnail to
+    # the correct directory in the output bucket.
     thumbnail_blob = storage_client.bucket(THUMBNAIL_BUCKET_NAME).blob(
         thumbnail_file_name)
 
-    # Uploads blob with current thumbnail to the correct directory
-    # in the output bucket.
+    # Uploads blob with current thumbnail to the correct directory in the outpu
+    # t bucket.
     thumbnail_blob.upload_from_filename(tmp_local_filename)
 
     os.remove(tmp_local_filename)
