@@ -47,7 +47,7 @@ def run_tsne(trigger_file, _):
 
     # Looks for all embeddings in the embedding folder to ensure they are all t
     # here
-    folder = '/'.join(trigger_file['name'].split('/')[:-1])
+    folder = os.path.dirname(file_name)
     embedding_file_names = sorted(list_blobs_with_prefix(
         trigger_file['bucket'], folder))
     num_actual_embeddings = len(trigger_file['name'])
