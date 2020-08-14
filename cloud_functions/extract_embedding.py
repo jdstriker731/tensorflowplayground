@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This function creates embeddings from a given image input.
-
 This cloud function first saves all necessary components of the DELG model to t
 mp directories from GCP storage buckets and after doing so uses tensorflow to l
 oad and run the saved model on the image.
 """
 import os
 import tempfile
+import file_path_utils as fp
 from google.cloud import storage
+from file_path_utils import get_user_and_dataset_name, get_photo_name
 import cv2
 import numpy as np
 import tensorflow as tf
@@ -42,6 +43,7 @@ os.mkdir('/tmp/saved_model/variables')
 # Download DELG SavedModel files:
 model_bucket = storage_client.bucket('delg_model_bucket')
 
+
 saved_model_blob = model_bucket.get_blob('saved_model.pb')
 saved_model_blob.download_to_filename('/tmp/saved_model/saved_model.pb')
 
@@ -51,19 +53,19 @@ variable_index_blob.download_to_filename('/tmp/saved_model/variables/variables.i
 variable_data_blob = model_bucket.get_blob('variables/variables.data-00000-of-00001')
 variable_data_blob.download_to_filename('/tmp/saved_model/variables/variables.data-00000-of-00001')
 
+
 # Load DELG from SavedModel dir.
 model = tf.saved_model.load('/tmp/saved_model/')
 
 # Make a fn() from the loaded model.
 embedding_fn = model.signatures[REQUIRED_SIGNATURE]
 
+
 # Entry point: triggered when file is added to the input bucket
 def extract_and_save_embedding(file_data, context):
     """Extracts and saves embeddings.
-
-    Runs locally saved delg model on each image, and uploads
-    the image blob to storage
-
+    Runs locally saved delg model on each image, and uploads the image blob
+    to storage.
     Args:
         file_data:
             Dictionary that contains data specific to the event.
@@ -77,7 +79,6 @@ def extract_and_save_embedding(file_data, context):
 
 def load_image(bucket_name, image_file_name):
     """Loads the actual image itself.
-
     Retrieves the image from storage, and resizes it if neccessary.
     Args:
         bucket_name:
@@ -85,18 +86,20 @@ def load_image(bucket_name, image_file_name):
         image_file_name:
             Name of the image itself.
     """
-    tmp_image_filename = os.path.join('/tmp', image_file_name.split('/')[-1])
+    tmp_image_filename = os.path.join(
+        '/tmp', image_file_name.split('/')[-1])
 
-    storage_client.bucket(bucket_name).get_blob(image_file_name).download_to_filename(tmp_image_filename)
+    storage_client.bucket(bucket_name).get_blob(
+        image_file_name).download_to_filename(tmp_image_filename)
     image = cv2.imread(tmp_image_filename)
 
-    # We check to make sure the image isn't too large for the 
-    # model that we are running
+    # We check to make sure the image isn't too large for the model that we
+    # are running.
     height, width, channels = image.shape
     long_side = max(width, height)
 
-    # If the image is larger than the biggest resolution
-    # then we have to resize it.
+    # If the image is larger than the biggest resolution then we have to re
+    # size it.
     if long_side > MAX_RESOLUTION:
         scale_ratio = MAX_RESOLUTION / long_side
         width = int(width * scale_ratio)
@@ -110,23 +113,19 @@ def load_image(bucket_name, image_file_name):
 
 def get_embedding(image):
     """Gets an embedding on the current image.
-
     Runs the DELG model on the current image.
-
     Args:
         image:
             CV2 image to be ran through model.
-    """    
+    """
     image_tensor = tf.convert_to_tensor(image)
-    print(f'coverting image to tensor')
     return embedding_fn(image_tensor)[REQUIRED_OUTPUT].numpy()
 
 
 def save_embedding(image_name, embedding):
     """Saves the image and stores it to the output bucket.
-
     Runs the DELG model on the current image.
-    
+
     Args:
         embedding:
             Numpy array embeddings for the given image.
@@ -138,40 +137,11 @@ def save_embedding(image_name, embedding):
     np.save(tmp_name, embedding)
 
     # Embedding gets saved to directory in storage
-    user_name, dataset_name, photo_name = get_blob_upload_components(
-        image_name)
-    embeddings_file_name = os.path.join
-        (user_name, dataset_name, EMBEDDINGS_FOLDER_NAME, photo_name + '.npy')
-    print(f'embeddings_file_name = {embeddings_file_name}')
+    user_name, dataset_name = get_user_and_dataset_name(image_name)
+    photo_name = get_photo_name(image_name)
+    embeddings_file_name = os.path.join(
+        user_name, dataset_name, EMBEDDINGS_FOLDER_NAME, photo_name + '.npy')
     bucket = storage_client.bucket(EMBEDDING_BUCKET_NAME)
     blob = bucket.blob(embeddings_file_name)
     blob.upload_from_filename(tmp_name)
     os.remove(tmp_name)
-    print('removed tmp file!')
-
-
-def get_blob_upload_components(file_name):
-    """Retrives the user, dataset, and image names from filepath.
-
-    Splits the filepath on slashes and 
-    returns the first two & last results in the filepath from
-    the array saved from .split().
-
-    Args:
-        file_data:
-            Key containing filepath in a string.
-    Returns:
-        user:
-            Name of the user who uploaded the files.
-        dataset_name:
-            Name of the dataset uploaded.
-        photo_name:
-            Name of the photo itself.
-
-    """
-    parts = file_name.split('/')
-    print(f'Parts: {parts}')
-    user = parts[0]
-    dataset_name = parts[1]
-    photo_name = parts[-1]
-    return user, dataset_name, photo_name
