@@ -83,7 +83,7 @@ def load_image(bucket_name, image_file_name):
             Name of the image itself.
     """
     tmp_image_filename = os.path.join(
-        '/tmp', image_file_name.split('/')[-1])
+        '/tmp', os.path.basename(image_file_name))
 
     storage_client.bucket(bucket_name).get_blob(
         image_file_name).download_to_filename(tmp_image_filename)
