@@ -30,7 +30,6 @@ REQUIRED_OUTPUT = 'global_descriptor'
 EMBEDDING_BUCKET_NAME = 'embeddings_visualizer_output_bucket'
 EMBEDDINGS_FOLDER_NAME = 'embeddings'
 MAX_RESOLUTION = 800
-
 # SETUP (runs once, when deploying):
 
 # Storage API
@@ -42,17 +41,12 @@ os.mkdir('/tmp/saved_model/variables')
 
 # Download DELG SavedModel files:
 model_bucket = storage_client.bucket('delg_model_bucket')
-
-
 saved_model_blob = model_bucket.get_blob('saved_model.pb')
 saved_model_blob.download_to_filename('/tmp/saved_model/saved_model.pb')
-
 variable_index_blob = model_bucket.get_blob('variables/variables.index')
 variable_index_blob.download_to_filename('/tmp/saved_model/variables/variables.index')
-
 variable_data_blob = model_bucket.get_blob('variables/variables.data-00000-of-00001')
 variable_data_blob.download_to_filename('/tmp/saved_model/variables/variables.data-00000-of-00001')
-
 
 # Load DELG from SavedModel dir.
 model = tf.saved_model.load('/tmp/saved_model/')
